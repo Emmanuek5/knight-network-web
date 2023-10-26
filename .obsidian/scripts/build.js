@@ -15,4 +15,6 @@ builder.buildALLStyles();
 builder.buildAllScripts();
 let end = new Date().getTime();
 logger("Build Completed in " + (end - start) + "ms");
-execSync("node ./.obsidian/workers/server/index.js", { stdio: "inherit" });
+const process = execSync("node ./.obsidian/workers/server/index.js", {
+  stdio: "inherit",
+});
