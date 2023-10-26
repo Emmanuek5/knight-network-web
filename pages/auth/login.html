@@ -1,0 +1,107 @@
+<style>
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    position: relative; /* Add relative positioning */
+  }
+
+  .form-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+    max-width: 300px;
+    width: 100%;
+    text-align: left; /* Align text to the left */
+  }
+
+  .form-container h1 {
+    color: #333;
+    margin-bottom: 10px; /* Reduce space below the heading */
+  }
+
+  .form-container label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+  }
+
+  .form-container input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .form-container input[type="submit"] {
+    background-color: #007bff; /* Change to blue color for a button look */
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    transition: background-color 0.3s;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+  }
+
+  .form-container input[type="submit"]:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+
+  .form-container .register-button {
+    display: inline-block;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+  }
+
+  .form-container .register-button:hover {
+    background-color: #2980b9;
+  }
+
+  .error {
+    display: none;
+    background-color: #d9534f; /* Red color for error */
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+  }
+
+  .error p {
+    margin: 0;
+    padding: 10px;
+    border-radius: 5px;
+  }
+</style>
+
+<div class="container">
+  <form action="" class="form-container">
+    <div class="error">
+      <p id="error-message"></p>
+    </div>
+    <h1>Login</h1>
+    <label for="username">Username or Email</label>
+    <input
+      type="text"
+      placeholder="Username or Email"
+      name="username"
+      required
+    />
+    <label for="password">Password</label>
+    <input type="password" placeholder="Password" name="password" required />
+    <input type="submit" value="Login" />
+    <a href="/auth/signup" class="register-button"
+      >Don't have an account? Sign up</a
+    >
+  </form>
+</div>

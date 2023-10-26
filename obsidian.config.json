@@ -1,0 +1,17 @@
+{
+  "name": "An Obsidian App",
+  "view_engine": "html",
+  "port": 80,
+  "db_port": 27017,
+  "db_name": "obsidian",
+  "db_url": "",
+  "mode": "dev",
+  "no_imports": false,
+  "workers": {
+    "api": {
+      "path": "/api",
+      "enabled": true,
+      "restricted": false
+    }
+  }
+}

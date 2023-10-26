@@ -1,0 +1,160 @@
+<style>
+  /* Add this CSS for the post view container */
+  .forum_post_view_container {
+    width: 60%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .top img {
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .top h2 {
+    margin-right: auto;
+    color: #3498db;
+  }
+
+  .top p {
+    margin-right: 10px;
+    color: #95a5a6; /* Gray color for post date */
+  }
+
+  .top button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5%;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    margin-right: 10px;
+  }
+
+  .top button:hover {
+    background-color: #2980b9;
+  }
+
+  .forum_post_content p {
+    color: #000;
+  }
+
+  .bottom {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .bottom button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5%;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .bottom button:hover {
+    background-color: #2980b9;
+  }
+
+  .forum_post_comments {
+    margin-top: 20px;
+  }
+
+  .comment {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .comment img {
+    width: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .comment h4 {
+    margin-right: auto;
+    color: #e74c3c; /* Red color for comment username */
+  }
+
+  .comment p {
+    color: #000;
+  }
+</style>
+<input type="hidden" name="forum_id" value="<<$id>>" />
+<div class="forum_post_view_container">
+  <div class="top">
+    <img src="" alt="" />
+    <h2>Username</h2>
+    <p>Post Date</p>
+    <button>Like</button>
+    <button>Dislike</button>
+    <button>Report</button>
+  </div>
+  <div class="forum_post_content">
+    <h1>Title</h1>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores
+      nesciunt quis molestiae error laudantium deserunt quia possimus quae.
+      Nobis facere iusto deserunt corporis perferendis necessitatibus eos et.
+      Quidem, similique itaque.
+    </p>
+  </div>
+</div>
+<script>
+  const id = document.querySelector("input[name='forum_id']").value;
+  const forumPostView = document.querySelector(".forum_post_view_container");
+  const route = "/api/forums/";
+
+  fetch(route + id)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        error.style.display = "block";
+        error.innerHTML = `<p>Error Getting Forum posts from the server</p>`;
+        setTimeout(() => {
+          error.style.display = "none";
+        }, 3000);
+      }
+      // Update HTML with data
+      const title = document.querySelector(".forum_post_content h1");
+      const userImage = document.querySelector(".top img");
+      const username = document.querySelector(".top h2");
+      const postDate = document.querySelector(".top p");
+      const likeButton = document.querySelector(".top button:nth-child(1)");
+      const dislikeButton = document.querySelector(".top button:nth-child(2)");
+      const reportButton = document.querySelector(".top button:nth-child(3)");
+      const postContent = document.querySelector(".forum_post_content p");
+
+      // Set values based on the data from the API
+      userImage.src = data.userimageurl;
+      title.textContent = data.title;
+      username.textContent = data.username;
+      postDate.textContent = formatDate(data.date); // Assuming you have a function to format the date
+      postContent.textContent = data.content;
+    });
+
+  function formatDate(date) {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return new Date(date).toLocaleDateString("en-US", options);
+  }
+</script>

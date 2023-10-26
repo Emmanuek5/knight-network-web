@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <!-- Rest of your head content -->
+    <title>Knight Network</title>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <input type="hidden" name="authenticated" value="<<$authenticated>>" />
+        <div class="header_left">
+          <img src="/assets/logo.png" alt="logo" />
+          <a href="/"><h1>Knight Network</h1></a>
+        </div>
+        <div class="header_right">
+          <ul>
+            <li>
+              <a href="/"
+                ><button><i class="fas fa-home"></i> Home</button></a
+              >
+            </li>
+            <li>
+              <a href="/about"
+                ><button><i class="fas fa-info-circle"></i> About</button></a
+              >
+            </li>
+            <li>
+              <a href="/forums"
+                ><button><i class="fas fa-comments"></i> Forums</button></a
+              >
+            </li>
+            <li>
+              <a href="/bans"
+                ><button><i class="fas fa-ban"></i> Bans</button></a
+              >
+            </li>
+            <li>
+              <a href="/contact"
+                ><button><i class="fas fa-envelope"></i> Contact</button></a
+              >
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    <div class="error">
+      <p id="error-message"></p>
+    </div>
+    <script>
+      const ul = document.querySelector("ul");
+      const authenticated_element = document.querySelector(
+        "input[name='authenticated']"
+      ).value;
+      const authenticated = checkAuthenticated();
+
+      function checkAuthenticated() {
+        console.log(authenticated_element);
+        if (authenticated_element == "true") {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      if (!authenticated) {
+        // Add login and signup buttons to the navigation
+        const loginLi = document.createElement("li");
+        const loginButton = document.createElement("button");
+        loginButton.textContent = "Login";
+        loginLi.appendChild(loginButton);
+
+        // Append the new elements to the navigation
+        ul.appendChild(loginLi);
+
+        // Add event listeners or link them to the login and signup pages
+        loginButton.addEventListener("click", () => {
+          window.location = "/auth/login"; // Change to your login route
+        });
+      } else {
+        ul.innerHTML += `<li class="dropdown">
+                    <button class="dropbtn">Profile</button>
+                    <div class="dropdown-content">
+        <a href="/profile"><i class="fas fa-user"></i> View Profile</a>
+        <a href="/settings"><i class="fas fa-cog"></i> Settings</a>
+      </div>
+                  </li>
+                  <li>
+                    <a href="/api/logout"><button>Logout</button></a>
+                  </li>`;
+      }
+    </script>
+    <<$content>>
+  </body>
+</html>

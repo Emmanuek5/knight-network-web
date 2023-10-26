@@ -1,0 +1,18 @@
+{
+  "name": "obsidianserver",
+  "version": "1.0.0",
+  "description": "The rendering engine for the obsidian-engine",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "node lib/tests/start.js",
+    "start": ""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "url": "^0.11.3"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "layout": "main",
+  "scripts": ["login.js"],
+  "styles": ["styles.css"],
+  "render_options": {
+    "title": "Home",
+    "name": "Obsidian Engine"
+  },
+  "meta": {
+    "title": "Obsidian Engine",
+    "description": "This is a site rendered by the Obsidian Engine. Check it out on GitHub: https://github.com/Emmanuek5/obsidian-engine and contact me on Discord: .blueobsidian if you need anything.",
+    "image": "/assets/meta.png",
+    "og:url": "https://obsidian-engine.blueobsidian.repl.co",
+    "og:type": "website",
+    "og:title": "Obsidian Engine",
+    "og:description": "This is a site rendered by the Obsidian Engine. Check it out on GitHub: https://github.com/Emmanuek5/obsidian-engine and contact me on Discord: .blueobsidian if you need anything.",
+    "og:image": "/assets/meta.png"
+  }
+}
