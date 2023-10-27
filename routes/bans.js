@@ -10,7 +10,7 @@ router.post("/create", (req, res) => {
 
   // Convert isPermanent to boolean
   const isPermanentBoolean = Boolean(isPermanent);
-  const id = md5(username + reason + expiry + rand(1, 10000000));
+  const id = md5(username + rand(1, 10000000));
   if (username && reason && expiry) {
     const newBan = bansModel.insertOne({
       id,
@@ -41,9 +41,28 @@ router.post("/create", (req, res) => {
   }
 });
 
+router.get("/get/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  const ban = bansModel.find({ uuid: uuid });
+  if (ban) {
+    res.status(200).json(ban);
+  } else {
+    res.status(400).send("Ban not found");
+  }
+});
+
 router.get("/list", (req, res) => {
   const bans = bansModel.find({});
-  res.status(200).json(bans);
+  const json = [];
+  bans.forEach((ban) => {
+    json.push({
+      username: ban.username,
+      reason: ban.reason,
+      expiry: formatMillisecs(ban.expiry),
+      isPermanent: ban.isPermanent,
+    });
+  });
+  res.status(200).json(json);
 });
 
 router.put("/update", (req, res) => {
@@ -81,6 +100,38 @@ function md5(data) {
 
 function rand(min = 0, max = 1) {
   return Math.random() * (max - min) + min;
+}
+
+function formatMillisecs(millis) {
+  const seconds = Math.floor(millis / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(weeks / 4);
+  const years = Math.floor(months / 12);
+
+  if (years > 0) {
+    return `${years}y`;
+  }
+  if (months > 0) {
+    return `${months}mo`;
+  }
+  if (weeks > 0) {
+    return `${weeks}w`;
+  }
+  if (days > 0) {
+    return `${days}d`;
+  }
+  if (hours > 0) {
+    return `${hours}h`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m`;
+  }
+  if (seconds > 0) {
+    return `${seconds}s`;
+  }
 }
 
 module.exports = router;

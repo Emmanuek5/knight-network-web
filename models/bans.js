@@ -1,4 +1,4 @@
-const {Table} = require("../modules");
+const { Table } = require("../modules");
 const table = new Table();
 
 table.name = "bans";
@@ -6,7 +6,7 @@ table.name = "bans";
 table.setSchema({
   id: {
     type: "string",
-    required: true
+    required: true,
   },
   username: {
     type: "string",
@@ -26,8 +26,9 @@ table.setSchema({
   },
   isPermanent: {
     type: "boolean",
-    required: true,
-  }
+    required: false,
+    default: false,
+  },
 });
 
 module.exports = table;

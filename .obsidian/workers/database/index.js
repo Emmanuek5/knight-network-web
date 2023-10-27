@@ -593,11 +593,16 @@ class Table extends EventEmitter {
     }
 
     for (const key in this.schema) {
-      if (this.schema[key].required && !row[key]) {
+      if (this.schema[key].required && !row[key] && row[key] !== 0) {
         console.error(
           `Column '${key}' is required but not provided in the inserted row.`
         );
         return false;
+      }
+
+      // Check if the default value is defined in the schema
+      if (this.schema[key].default !== undefined && row[key] === undefined) {
+        row[key] = this.schema[key].default;
       }
 
       // Check if the type is defined in the schema
@@ -662,7 +667,7 @@ class Table extends EventEmitter {
    * Finds and returns a list of rows from the data that match the given query.
    *
    * @param {Object} query - The query to match the rows against.
-   * @return {Array} - An array of rows that match the query.
+   * @return {Table} - An array of rows that match the query.
    */
   find(query) {
     if (
