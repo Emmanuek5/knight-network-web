@@ -4,16 +4,16 @@
   "styles": ["styles.css"],
   "render_options": {
     "title": "Home",
-    "name": "Obsidian Engine"
+    "name": "Knight Network"
   },
   "meta": {
-    "title": "Obsidian Engine",
-    "description": "This is a site rendered by the Obsidian Engine. Check it out on GitHub: https://github.com/Emmanuek5/obsidian-engine and contact me on Discord: .blueobsidian if you need anything.",
-    "image": "/assets/meta.png",
-    "og:url": "https://obsidian-engine.blueobsidian.repl.co",
+    "title": "Knight Network",
+    "description": " KnightSMP is a great server. We have different gamemodes and mainly theones are: Lifesteal and Kit PVP. Join our server, make friends and enemies. Become the best. Join crazy events like; End fight and otherfun events to win OP rewards. Here's our discord server:https://discord.gg/knightnetwork ",
+    "image": "/assets/logo-500.png",
+    "og:url": "https://knight-network.xyz/",
     "og:type": "website",
-    "og:title": "Obsidian Engine",
-    "og:description": "This is a site rendered by the Obsidian Engine. Check it out on GitHub: https://github.com/Emmanuek5/obsidian-engine and contact me on Discord: .blueobsidian if you need anything.",
-    "og:image": "/assets/meta.png"
+    "og:title": "Knight Network",
+    "og:description": " KnightSMP is a great server. We have different gamemodes and mainly the  ones are: Lifesteal and Kit PVP. Join our server, make friends and  enemies. Become the best. Join crazy events like; End fight and other fun events to win OP rewards. Here's our discord server: https://discord.gg/knightnetwork",
+    "og:image": "/assets/logo-500.png"
   }
 }
