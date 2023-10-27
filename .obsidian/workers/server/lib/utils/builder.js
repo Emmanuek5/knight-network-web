@@ -8,7 +8,7 @@ class Build {
     this.distDir = process.cwd() + "/dist"; // Set your destination (dist) directory
     this.scriptsDir = process.cwd() + "/public/js"; // Set your scripts directory
     this.stylesDir = process.cwd() + "/public/css"; // Set your styles directory
-    this.pagesdistDir = process.cwd() + "/dist/pages"; // Set your destination (dist) directory
+    this.pagesdistDir = process.cwd() + "/dist/"; // Set your destination (dist) directory
     this.renderEngines = new RenderEngines();
   }
 
