@@ -10,7 +10,7 @@ router.post("/create", (req, res) => {
 
   // Convert isPermanent to boolean
   const isPermanentBoolean = Boolean(isPermanent);
-  const id = md5(username + rand(1, 10000000));
+  const id = md5(username);
   if (username && reason && expiry) {
     const newBan = bansModel.insertOne({
       id,
