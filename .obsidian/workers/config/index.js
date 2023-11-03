@@ -47,13 +47,14 @@ class Config {
    * @property {string} workers.api.secret - The secret key for the API worker.
    */
   getDefaultConfig() {
-    const defaultPort = 3001; // Default port value
+    const defaultPort = 3001; // Default port valu
 
     return {
       name: "An Obsidian App",
       mode: "dev",
       port: 3000,
       no_imports: false,
+      github_webhook_secret: this.md5(this.rand()),
       workers: {
         api: {
           port:
@@ -69,6 +70,15 @@ class Config {
     };
   }
 
+  md5(str) {
+    return crypto.createHash("md5").update(str).digest("hex");
+  }
+  rand() {
+    return (
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15)
+    );
+  }
   loadConfig() {
     const configFile = this.getConfigFile();
     if (!fs.existsSync(configFile)) {
