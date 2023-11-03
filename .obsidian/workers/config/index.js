@@ -64,7 +64,7 @@ class Config {
           path: "/api",
           enabled: true,
           restricted: false,
-          secret: undefined, // Include this line in the JSDoc
+          secret: crypto.randomBytes(64).toString("hex"), // Include this line in the JSDoc
         },
       },
     };

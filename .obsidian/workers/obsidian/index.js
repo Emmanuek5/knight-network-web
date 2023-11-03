@@ -6,6 +6,11 @@ const path = require("path");
 const fs = require("fs");
 const ps = require("ps-node"); // Import the ps-node package
 const { COLORS } = require("./colours");
+const builderpath = path.join(
+  process.cwd(),
+  ".obsidian/workers/builder/index.js"
+);
+const { Builder } = require(builderpath);
 
 const args = process.argv.slice(2);
 const mode_types = ["dev", "run", "build"];
@@ -39,10 +44,6 @@ if (!fs.existsSync(args[0])) {
   process.exit(1);
 }
 
-const { Builder } = require(path.join(
-  workingPath,
-  ".obsidian/workers/builder/index.js"
-));
 const { Config } = require(path.join(
   workingPath,
   ".obsidian/workers/config/index.js"
@@ -94,8 +95,6 @@ watcher.on("ready", () => {
     // No need to startNodeProcess here; it's automatically restarted in the 'exit' handler
   });
 });
-
-
 
 // Function to stop a process by port
 function stopNodeProcessByPort(port) {
