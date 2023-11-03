@@ -56,6 +56,8 @@ class Github {
   updateRepository() {
     console.log("Updating repository...");
     execSync("git pull origin main"); // Assuming the main branch, modify if needed
+    console.log("Repository updated successfully");
+    this.app.emit("update"); // Notify the main process that the repository has been updated
   }
 }
 
