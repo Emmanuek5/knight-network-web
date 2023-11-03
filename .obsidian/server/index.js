@@ -131,11 +131,11 @@ app.get("/favicon.ico", (req, res) => {
     res.file(defaultFaviconPath);
   }
 });
+
 app.use("/assets", path.join(process.cwd(), "/assets"));
 app.use("/public", path.join(process.cwd(), "/public"));
 app.use("/scripts", path.join(process.cwd(), "/public/js"));
 app.use("/styles", path.join(process.cwd(), "/public/css"));
-
 app.get("/robots.txt", (req, res) => {
   const robotsPath = path.join(process.cwd(), "public/robots.txt");
   if (fs.existsSync(robotsPath)) {

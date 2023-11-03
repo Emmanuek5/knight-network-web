@@ -587,13 +587,13 @@ class Table extends EventEmitter {
     const schemaKeys = Object.keys(this.schema);
     const rowKeys = Object.keys(row);
 
-    if (!schemaKeys.every((key) => rowKeys.includes(key))) {
-      console.error("Inserted row doesn't match the table schema.");
-      return false;
-    }
-
     for (const key in this.schema) {
-      if (this.schema[key].required && !row[key] && row[key] !== 0) {
+      // Check if the key is required and not provided (unless it has a default)
+      if (
+        this.schema[key].required &&
+        !rowKeys.includes(key) &&
+        this.schema[key].default === undefined
+      ) {
         console.error(
           `Column '${key}' is required but not provided in the inserted row.`
         );

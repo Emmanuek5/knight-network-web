@@ -22,11 +22,14 @@ router.post("/login", (req, res) => {
     else {
       req.session.user = {
         username: data.username,
+        image: data.image,
+        bio: data.bio,
+        rank: data.rank,
+        points: data.points,
         email: data.email,
         id: data._id,
       };
       req.session.save();
-      console.log(req.session);
       const json = {
         success: true,
         message: "Login successful",
@@ -44,6 +47,7 @@ router.post("/login", (req, res) => {
 
 router.post("/signup", (req, res) => {
   const { username, password, email } = req.body;
+
   const data = userModel.findByOr({ username, email });
   console.log(data);
   if (data.length > 0) {
@@ -61,13 +65,19 @@ router.post("/signup", (req, res) => {
     return;
   }
   const id = uuid.v4();
-  userModel.insertOne({
+  let datas = userModel.insertOne({
     id,
     username,
     image: "/assets/user.png",
+    rank: "User",
+    points: 0,
     password,
     email,
   });
+  if (!datas) {
+    res.status(400).json({ error: true, message: "Signup failed" });
+    return;
+  }
   const json = {
     success: true,
     message: "Signup successful",

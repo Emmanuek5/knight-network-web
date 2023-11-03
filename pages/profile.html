@@ -1,0 +1,102 @@
+<style>
+  /* Add this CSS for the profile container */
+  .profile-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    margin: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    color: #3498db;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    margin-top: 10px;
+    color: #555;
+  }
+
+  input,
+  textarea {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+
+  input[type="submit"] {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  input[type="submit"]:hover {
+    background-color: #2980b9;
+  }
+</style>
+
+<div class="profile-container">
+  <h1>User Profile</h1>
+  <form action="">
+    <label for="username">Username</label>
+    <input type="text" name="username" id="username" />
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" />
+    <label for="bio"> Bio</label>
+    <textarea name="bio" id="bio" cols="30" rows="10"></textarea>
+    <label for="image">Image</label>
+    <input type="text" name="image" id="image" />
+    <input type="submit" value="Save" />
+  </form>
+</div>
+<script>
+  if (!authenticated) {
+    window.location.href = "/auth/login";
+  }
+  fetch("/api/user/current")
+    .then((response) => response.json())
+    .then((data) => {
+      const form = document.querySelector("form");
+      const { username, email, bio, image } = data;
+      form.username.value = username;
+      form.email.value = email;
+      form.bio.value = bio;
+      form.image.value = image;
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const username = form.username.value;
+        const email = form.email.value;
+        const bio = form.bio.value;
+        const image = form.image.value;
+        const json = {
+          username,
+          email,
+          bio,
+          image,
+        };
+        fetch("/api/user/current", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(json),
+        });
+      });
+    });
+  const form = document.querySelector("form");
+</script>

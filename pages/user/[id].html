@@ -1,0 +1,55 @@
+<style>
+  /* Add this CSS for the user container */
+  .user-container {
+    width: 300px;
+    margin: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .top img {
+    width: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .top h2 {
+    color: #3498db;
+  }
+
+  .info {
+    color: #555;
+  }
+</style>
+
+<div class="user-container">
+  <input type="hidden" name="id" value="<<$id>>" />
+  <div class="top">
+    <img src="/assets/user.png" alt="" />
+    <h2>User name</h2>
+  </div>
+  <div class="info">
+    <!-- Add user information here -->
+  </div>
+  <script>
+    const id = document.querySelector('input[name="id"]').value;
+    fetch("/api/user/" + id)
+      .then((response) => response.json())
+      .then((data) => {
+        const h2 = document.querySelector(" .top h2");
+        const img = document.querySelector(".user-container img");
+        h2.textContent = data.username;
+        img.src = data.userimage;
+        const info = document.querySelector(".info");
+        info.textContent = data.info;
+      });
+  </script>
+</div>
