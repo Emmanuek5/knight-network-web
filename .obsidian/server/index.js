@@ -29,11 +29,7 @@ if (!config.get("db_url") === undefined && config.get("db_url") !== "") {
   url = "database";
 }
 
-if (
-  config.get("github_url") !== undefined &&
-  config.get("github_url") !== "" &&
-  config.get("auto_update") === true
-) {
+if (config.get("auto_update") === true) {
   const { Github } = require("../workers/github");
   const github = new Github(app, config.get("github_webhook_secret"));
 }
