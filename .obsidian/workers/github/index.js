@@ -5,6 +5,7 @@ class Github {
   constructor(app, token) {
     this.app = app;
     this.token = token;
+    console.log("Github initialized");
     this.app.post("/webhook/:token", this.handleWebhook);
   }
 
