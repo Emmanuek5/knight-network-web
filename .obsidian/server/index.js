@@ -71,17 +71,26 @@ if (fs.existsSync(routesPath) && fs.lstatSync(routesPath).isDirectory()) {
 if (fs.existsSync(pagesPath) && fs.lstatSync(pagesPath).isDirectory()) {
   fs.readdirSync(pagesPath).forEach((folder) => {
     const folderPath = path.join(pagesPath, folder);
-    if (fs.lstatSync(folderPath).isDirectory() || folder.endsWith("]")) {
-      const folderKey = folder.startsWith("[") ? folder.slice(1, -1) : folder;
+    if (fs.lstatSync(folderPath).isDirectory() || folder.includes("[")) {
+      const folderKey = folder.includes("[") ? folder.slice(1, -1) : folder;
+
       fs.readdirSync(folderPath).forEach((file) => {
         if (file.endsWith(".html")) {
           const fileName = file.slice(0, -5); // Remove ".html" extension
           const isIndex = fileName === "index";
           const route = isIndex
             ? `/${folderKey}` // Register index file as /
-            : fileName.startsWith("[") && fileName.endsWith("]")
+            : fileName.startsWith("[") &&
+              fileName.endsWith("]") &&
+              folder.startsWith("[") &&
+              folder.endsWith("]")
             ? `/:${folderKey}/:${fileName.slice(1, -1)}`
+            : fileName.startsWith("[") && fileName.endsWith("]")
+            ? `/${folderKey}/:${fileName.slice(1, -1)}`
+            : folder.startsWith("[") && folder.endsWith("]")
+            ? `/:${folderKey}${isIndex ? "" : "/"}${fileName}`
             : `/${folderKey}${isIndex ? "" : "/"}${fileName}`;
+
           registerRoute(route, folder, fileName);
         }
       });
@@ -93,6 +102,7 @@ if (fs.existsSync(pagesPath) && fs.lstatSync(pagesPath).isDirectory()) {
         : fileName.startsWith("[") && fileName.endsWith("]")
         ? `/:${fileName.slice(1, -1)}`
         : `/${fileName}`;
+
       registerRoute(route, "/", fileName);
     }
   });

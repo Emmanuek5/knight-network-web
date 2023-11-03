@@ -1,5 +1,6 @@
 const url = require("url");
 const querystring = require("querystring");
+const fs = require("fs");
 
 class Request {
   constructor(httpRequest) {
@@ -67,77 +68,101 @@ class Request {
 
   // ...
 
-  parseFormData() {
-    const boundary = this.headers["content-type"].split("=")[1];
-    const parts = this.body.split(`--${boundary}`);
+  async parseFormData() {
+    return new Promise((resolve, reject) => {
+      const boundary = this.headers["content-type"].split("=")[1];
+      const parts = this.body.split(`--${boundary}`);
 
-    const formData = {};
-    const files = {};
+      const formData = {};
+      const files = {};
 
-    // Iterate through parts, excluding the last (empty) part
-    for (let i = 1; i < parts.length - 1; i++) {
-      const part = parts[i].trim();
+      // Iterate through parts, excluding the last (empty) part
+      for (let i = 1; i < parts.length - 1; i++) {
+        const part = parts[i];
 
-      if (!part.includes("filename") && !part.includes("Content-Disposition")) {
-        // Skip if it's not a valid part
-        continue;
-      }
-
-      // Check if it's a field or a file
-      if (part.includes("filename")) {
-        const file = {};
-        const lines = part.split("\r\n");
-
-        // Extract file details
-        const fileDetails = lines[1];
-        const fileNameMatch = fileDetails.match(/filename="(.*)"/);
-        const fileName = fileNameMatch ? fileNameMatch[1] : undefined;
-
-        if (!fileName) {
-          // Skip if filename is not found
+        if (
+          !part.includes("filename") &&
+          !part.includes("Content-Disposition")
+        ) {
+          // Skip if it's not a valid part
           continue;
         }
 
-        const fileTypeMatch = fileDetails.match(/Content-Type: (.*)/);
-        const fileType = fileTypeMatch ? fileTypeMatch[1] : undefined;
+        // Check if it's a field or a file
+        if (part.includes("filename")) {
+          const file = {};
+          const lines = part.split("\r\n");
 
-        file.name = fileName;
-        file.type = fileType;
+          // Extract file details
+          const fileDetails = lines[0] + lines[1];
+          const fileNameMatch = fileDetails.match(/filename="(.*)"/);
+          const fileName = fileNameMatch ? fileNameMatch[1] : undefined;
 
-        // Check if file data is base64 encoded
-        const isBase64 =
-          lines[2] && lines[2].includes("Content-Transfer-Encoding: base64");
+          if (!fileName) {
+            console.log("no filename");
+            // Skip if filename is not found
+            continue;
+          }
 
-        // Extract file data
-        const fileDataLines = isBase64
-          ? lines.slice(4, -1)
-          : lines.slice(3, -1);
-        const fileData = isBase64
-          ? fileDataLines.join("")
-          : fileDataLines.join("\r\n");
-        file.data = isBase64 ? Buffer.from(fileData, "base64") : fileData;
-        // Add file to files object
-        files[fileName] = file;
-      } else {
-        // It's a regular form field
-        const [header, value] = part.split("\r\n\r\n");
-        const fieldNameMatch = header.match(/name="(.*)"/);
-        const fieldName = fieldNameMatch ? fieldNameMatch[1] : undefined;
+          const fileRequestNameMatch = fileDetails.match(/name="(.*?)"/);
+          const fileRequestName = fileRequestNameMatch
+            ? fileRequestNameMatch[1]
+            : undefined;
 
-        if (!fieldName) {
-          // Skip if field name is not found
-          continue;
+          const fileTypeMatch = fileDetails.match(/Content-Type: (.*)/);
+          const fileType = fileTypeMatch ? fileTypeMatch[1] : undefined;
+          file.name = fileName;
+          file.type = fileType;
+
+          // Remove the content type and disposition
+          const fileDataLines = part
+            .replace(/Content-Disposition:.*\r\n/, "")
+            .replace(/Content-Type:.*\r\n/, "");
+
+          // Parse to different buffer types based on file type
+          if (fileType === "image/png") {
+            file.data = Buffer.from(fileDataLines, "base64");
+          } else {
+            file.data = Buffer.from(fileDataLines);
+          }
+
+          // Add the mv function to the file object
+          file.mv = (destinationPath, callback) => {
+            // Use fs.writeFileSync to save the file to the specified destination path without encoding
+            fs.writeFileSync(destinationPath, file.data, (err) => {
+              if (err) {
+                callback(err);
+              } else {
+                callback(null);
+              }
+            });
+          };
+
+          // Add file to files object
+          files[fileRequestName] = file;
+        } else {
+          // It's a regular form field
+          const [header, value] = part.split("\r\n\r\n");
+          const fieldNameMatch = header.match(/name="(.*)"/);
+          const fieldName = fieldNameMatch ? fieldNameMatch[1] : undefined;
+
+          if (!fieldName) {
+            // Skip if field name is not found
+            continue;
+          }
+
+          formData[fieldName] = value;
         }
-
-        formData[fieldName] = value;
       }
-    }
 
-    // Assign parsed form data and files to the respective properties
-    this.body = formData;
-    this.files = files;
-
-    return { formData, files };
+      // Assign parsed form data and files to the respective properties
+      this.body = formData;
+      this.files = files;
+      console.log(this.body);
+      console.log(this.files);
+      resolve();
+      return { formData, files };
+    });
   }
 
   getFilesFromRequest() {

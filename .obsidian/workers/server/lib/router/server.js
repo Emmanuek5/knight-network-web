@@ -119,18 +119,24 @@ class Server extends event.EventEmitter {
     const sessionFilePath = path.join(COOKIES_DIR, `${session.id}.json`);
     fs.writeFileSync(sessionFilePath, JSON.stringify(session), "utf-8");
   }
+  /**
+   * Parses the request body based on the content type.
+   *
+   * @param {Request} request - The request object.
+   * @return {Promise} A promise that resolves when the body is parsed.
+   */
   async parseRequestBody(request) {
     return new Promise(async (resolve, reject) => {
       const contentType = request.headers["content-type"];
-
       if (contentType && contentType.includes("application/json")) {
         // Parse JSON body
         request.getBodyAsJSON();
         resolve();
       } else if (contentType && contentType.includes("multipart/form-data")) {
         // Parse multipart/form-data
-        request.parseFormData();
-        resolve();
+        await request.parseFormData().then(() => {
+          resolve();
+        });
       } else if (
         contentType &&
         contentType.includes("application/x-www-form-urlencoded")

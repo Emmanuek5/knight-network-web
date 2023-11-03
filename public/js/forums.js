@@ -29,7 +29,7 @@ if (!currentlocation.includes("new")) {
           userImage.alt = "user";
 
           const usernameLink = document.createElement("a");
-          usernameLink.href = `/users/${post.userid}`; // Use a proper link if available
+          usernameLink.href = `/user/${post.userid}`; // Use a proper link if available
           usernameLink.textContent = post.username;
 
           const usernameHeader = document.createElement("h4");
