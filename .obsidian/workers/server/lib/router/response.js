@@ -9,6 +9,10 @@ class Response {
     this.headers = {
       "Content-Type": "text/html",
       Engine: "Obsidian Engine",
+      Engine_Version: require("../../../../../package.json").version,
+      Engine_Author: require("../../../../../package.json").author,
+      Engine_License: require("../../../../../package.json").license,
+      Engine_Repo: require("../../../../../package.json").repository.url,
     };
     this.mainPath = process.cwd() + "/pages";
     this.rendered = false;
