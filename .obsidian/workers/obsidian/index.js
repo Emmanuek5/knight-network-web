@@ -10,6 +10,8 @@ const builderpath = path.join(
   process.cwd(),
   ".obsidian/workers/builder/index.js"
 );
+const util = require("util");
+const exec = util.promisify(require("child_process").exec);
 const { Builder } = require(builderpath);
 
 const args = process.argv.slice(2);
@@ -49,6 +51,27 @@ const { Config } = require(path.join(
   ".obsidian/workers/config/index.js"
 ));
 const config = new Config();
+
+async function stopNodeProcessByPort(port) {
+  try {
+    // Run netstat command to find processes using the specified port
+    const { stdout } = await exec(
+      `netstat -ano | find "LISTENING" | find "${port}"`
+    );
+
+    // Parse the output to get the process IDs
+    const pids = stdout
+      .split("\n")
+      .map((line) => line.trim().split(/\s+/).pop())
+      .filter((pid) => !isNaN(pid));
+
+    // Stop each process using taskkill
+    for (const pid of pids) {
+      await exec(`taskkill /F /PID ${pid}`);
+      logger(`Stopped process with PID ${pid} using port ${port}`);
+    }
+  } catch (error) {}
+}
 // Function to start the Node.js process
 function startNodeProcess() {
   if (processExited) {
@@ -74,49 +97,46 @@ function startNodeProcess() {
       nodeProcess = null;
       processExited = true;
       logger(COLORS.RED_TEXT + "ENGINE EXITED. Restarting...");
-      startNodeProcess(); // Restart the Node.js process
     });
   }
 }
 
-const watcher = chokidar.watch(path.join(workingPath, "/pages"), {
-  ignored: /(^|[\/\\])\../,
+function stopCurrentNodeProcess() {
+  if (nodeProcess) {
+    const pid = nodeProcess.pid;
+    logger(`Stopping current running process with PID ${pid}`);
+
+    // Use SIGKILL for forceful termination
+    process.kill(pid, "SIGKILL");
+
+    nodeProcess = null;
+    processExited = true;
+  }
+}
+
+const watcher = chokidar.watch(workingPath, {
+  //let it skip html and css files
+  ignored: [/node_modules/, /.git/, /.obsidian/, /.*\.html$/, /.*\.css$/],
   persistent: true,
 });
 
+// Function to stop the current running Node.js process
+// ...
+
 watcher.on("ready", () => {
   watcher.on("all", (event, path) => {
-    logger("Clearing /pages/ module cache from server");
-    Object.keys(require.cache).forEach((id) => {
-      if (/[\/\\]pages[\/\\]/.test(id)) delete require.cache[id];
-    });
     logger(`File changed ${path}`);
-    stopNodeProcessByPort(config.get("port")); // Replace with the desired port to stop
-    // No need to startNodeProcess here; it's automatically restarted in the 'exit' handler
+    logger("Clearing module cache from server");
+    const start_time = new Date();
+    stopCurrentNodeProcess(); // Stop the current running process
+    stopNodeProcessByPort(config.config.db_port); // Stop the process by port
+    stopNodeProcessByPort(config.config.port); // Stop the process by port
+    logger(`Module cache cleared. Took: ${new Date() - start_time}ms`);
+    startNodeProcess();
   });
 });
 
 // Function to stop a process by port
-function stopNodeProcessByPort(port) {
-  ps.lookup(
-    {
-      command: "node",
-      arguments: args,
-    },
-    (err, resultList) => {
-      if (err) {
-        throw new Error(err);
-      }
-
-      resultList.forEach((processInfo) => {
-        if (processInfo.arguments.includes(`:${port}`)) {
-          logger(`Stopping process with PID ${processInfo.pid}`);
-          process.kill(processInfo.pid, "SIGTERM");
-        }
-      });
-    }
-  );
-}
 
 // Check for Obsidian Engine build
 if (!fs.existsSync(path.join(workingPath, "obsidian.config.json"))) {

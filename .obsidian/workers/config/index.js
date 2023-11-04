@@ -55,6 +55,7 @@ class Config {
       port: 3000,
       no_imports: false,
       view_engine: "html",
+      db_port: 6379,
       github_webhook_secret: this.md5(this.rand()),
       auto_update: true,
       workers: {
