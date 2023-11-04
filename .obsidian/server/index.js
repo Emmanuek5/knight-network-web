@@ -35,7 +35,7 @@ if (config.get("auto_update") === true) {
 }
 
 const database = new Database(url, portdb, remote);
-process.env.VIEWS_PATH = path.join(defaultPath, "views");
+process.env.VIEWS_PATH = pagesPath;
 process.env.VIEW_ENGINE = config.get("view_engine");
 
 if (fs.existsSync(tablesPath) && fs.lstatSync(tablesPath).isDirectory()) {

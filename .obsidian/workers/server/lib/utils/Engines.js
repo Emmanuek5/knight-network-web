@@ -389,6 +389,7 @@ class RenderEngines {
       options = Object.assign(options, optionsJson.render_options);
       options.meta = meta;
     }
+
     content = fs.readFileSync(filePath, "utf8");
     // Exclude the options.config property
     if (options.config) {
@@ -460,6 +461,7 @@ class RenderEngines {
         optionsJson.layout + ".html"
       );
       let layoutContent = fs.readFileSync(layoutFile, "utf8");
+
       // Replace <<$content>> in the layout with the actual content
       layoutContent = layoutContent.replace(/<<\$content>>/g, content);
       for (const key in options.render_options) {
