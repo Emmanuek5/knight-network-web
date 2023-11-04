@@ -5,19 +5,24 @@ const { Router } = require("./router/router");
 const { Server } = require("./router/server");
 const { METHODS } = require("./utils/constants");
 const { View } = require("./utils/view");
+const { EventEmitter } = require("events");
+const eventEmitter = new EventEmitter();
 
-class App {
+class App extends EventEmitter {
   constructor() {
-    this.config = new Config()
-     this.server = new Server(this.config.get("view_engine"));
+    super();
+    this.config = new Config();
+    this.server = new Server(this.config.get("view_engine"));
     this.cache = {};
     this.engines = {};
     this.locals = Object.create(null);
     this.mountpath = "/";
     this.set("view engine", "html"); // Set the default view engine
-    this.set("views", "views"); // Set the default views directory
+    this.set("views", "pages"); // Set the default views directory
     this.req = new Request(this.server.getHttpServer());
     this.res = new Response(this.server.getHttpServer());
+    this.emit = eventEmitter.emit;
+    this.on = eventEmitter.on;
   }
 
   /**
@@ -37,7 +42,7 @@ class App {
    * @param {string} file - The file or module to use as middleware.
    * @param {string} basePath - The base path for the middleware.
    */
-  use(basePath,file) {
+  use(basePath, file) {
     this.server.use(file, basePath);
   }
 
@@ -63,7 +68,7 @@ class App {
     return this.cache[setting];
   }
 
-  post (path, handler) {
+  post(path, handler) {
     this.server.addRoute(path, "POST", handler);
   }
 
@@ -76,32 +81,31 @@ class App {
    * @param {Response} handler.res - The response object.
    * @access public
    * @return {undefined} This function does not return anything.
-   * 
+   *
    */
-  get (path, handler) {
+  get(path, handler) {
     this.server.addRoute(path, "GET", handler);
   }
 
-  put (path, handler) {
+  put(path, handler) {
     this.server.addRoute(path, "PUT", handler);
   }
 
-  delete (path, handler) {
+  delete(path, handler) {
     this.server.addRoute(path, "DELETE", handler);
   }
 
-  patch (path, handler) {
+  patch(path, handler) {
     this.server.addRoute(path, "PATCH", handler);
   }
 
-  head (path, handler) {
+  head(path, handler) {
     this.server.addRoute(path, "HEAD", handler);
   }
 
-  update (path, handler) {
+  update(path, handler) {
     this.server.addRoute(path, "UPDATE", handler);
   }
-
 
   // Define a function to set application settings
   enable(setting) {
@@ -136,7 +140,7 @@ class App {
 
   // Define a function to get application settings
 
-  engine(name,fn){
+  engine(name, fn) {
     if (!fn && typeof name === "function") {
       fn = name;
       name = "html";
@@ -149,12 +153,12 @@ class App {
     const ext = name[0] !== "." ? "." + name : name;
 
     // store engine
-     this.engines[name] = {
-       renderer : fn,
-       ext: ext
-     }
-     console.log("Engine Registered");
-     console.log(this.engines[name]);
+    this.engines[name] = {
+      renderer: fn,
+      ext: ext,
+    };
+    console.log("Engine Registered");
+    console.log(this.engines[name]);
   }
 
   /**
@@ -192,4 +196,4 @@ module.exports = {
   Server,
   METHODS,
   View,
-}
+};

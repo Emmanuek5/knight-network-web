@@ -29,7 +29,6 @@ class Server extends event.EventEmitter {
     const response = new Response(res);
 
     response.viewEngine = this.viewEngine;
-    console.log(response.viewEngine);
 
     // Record the start time when the request is received
     const startTime = new Date();
