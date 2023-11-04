@@ -30,6 +30,20 @@ class Github {
     }
   }
 
+  setGlobalPullConfig(branch = "main") {
+    try {
+      execSync(`git config --global pull.rebase false`);
+      execSync(`git config --global pull.ff only`);
+      console.log(
+        `Global pull configuration set successfully for branch ${branch}`
+      );
+    } catch (error) {
+      console.error(
+        `Error setting global pull configuration: ${error.message}`
+      );
+    }
+  }
+
   isPushEvent(payload) {
     return (
       payload &&
