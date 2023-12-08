@@ -10,6 +10,7 @@ const pagesPath = path.join(defaultPath, "pages");
 const routesPath = path.join(defaultPath, "routes");
 const tablesPath = path.join(defaultPath, "models");
 const { spawn } = require("child_process");
+
 let portdb = null;
 let url = null;
 let remote = false;
@@ -142,6 +143,20 @@ app.use("/assets", path.join(process.cwd(), "/assets"));
 app.use("/public", path.join(process.cwd(), "/public"));
 app.use("/scripts", path.join(process.cwd(), "/public/js"));
 app.use("/styles", path.join(process.cwd(), "/public/css"));
+
+fs.readdir(path.join(__dirname, "resources"), (err, files) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  files.forEach((file) => {
+    const filePath = path.join(__dirname, "resources", file);
+    app.get("/server/" + file, (req, res) => {
+      res.file(filePath);
+    });
+  });
+});
 app.get("/robots.txt", (req, res) => {
   const robotsPath = path.join(process.cwd(), "public/robots.txt");
   if (fs.existsSync(robotsPath)) {

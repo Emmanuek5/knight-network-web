@@ -440,6 +440,8 @@ class RenderEngines {
       content = this.addFaviconToContent(content);
     }
 
+    content = this.addDefaultJavaScriptToContent(content);
+
     //check  for the <script> tag and get the content of the tag
     const scriptRegex = /<script>([\s\S]*?)<\/script>/g;
     const scriptMatches = content.matchAll(scriptRegex);
@@ -474,6 +476,7 @@ class RenderEngines {
           const pattern = new RegExp(`<<\\$${key}>>`, "g");
           layoutContent = layoutContent.replace(pattern, variable);
         }
+        layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
       } else {
         layoutContent = content;
       }
@@ -555,6 +558,7 @@ class RenderEngines {
       const optionsFile = fs.readFileSync(defaultOptionsFilePath, "utf8");
       const optionsJson = JSON.parse(optionsFile);
 
+      let layoutContent = "";
       if (
         optionsJson.layout &&
         optionsJson.layout !== "default" &&
@@ -566,7 +570,7 @@ class RenderEngines {
           this.layoutPath,
           optionsJson.layout + ".html"
         );
-        let layoutContent = fs.readFileSync(layoutFile, "utf8");
+        layoutContent = fs.readFileSync(layoutFile, "utf8");
         // Replace <<$content>> in the layout with the actual content
         layoutContent = layoutContent.replace(/<<\$content>>/g, content);
         for (const key in options.render_options) {
@@ -574,6 +578,7 @@ class RenderEngines {
           const pattern = new RegExp(`<<\\$${key}>>`, "g");
           layoutContent = layoutContent.replace(pattern, variable);
         }
+        layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
       } else {
         layoutContent = content;
       }
@@ -657,6 +662,18 @@ class RenderEngines {
     } else {
       return content;
     }
+  }
+
+  addDefaultJavaScriptToContent(content) {
+    // Create a regular expression to find the </head> tag in a case-insensitive manner
+    const headTagRegex = /<\/head>/i;
+    const scripts = ["server/defaults.js", "server/bundler.js"];
+    const scriptTags = scripts.map((script) => {
+      return `<script src="${script}"></script>`;
+    });
+
+    // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;
+    return content.replace(headTagRegex, `${scriptTags.join("\n")}\n</head>`);
   }
 
   isFaviconinContent(content) {

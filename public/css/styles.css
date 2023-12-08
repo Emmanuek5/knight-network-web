@@ -104,6 +104,10 @@
      color: #3498db;
  }
 
+ .owner_block .socials a {
+    color: #000;
+ }
+
 /* Add this CSS for the forum container and posts */
 .forum-container {
     width: 80%;
