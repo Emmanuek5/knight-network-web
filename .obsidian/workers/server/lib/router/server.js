@@ -249,6 +249,12 @@ class Server extends event.EventEmitter {
           } else {
             // Serve the file
             this.addRoute(routePath, "GET", (req, res) => {
+              //add content expiry
+              res.setHeader("Cache-Control", "public, max-age=31536000");
+              res.setHeader(
+                "Expires",
+                new Date(Date.now() + 31536000000).toUTCString()
+              );
               res.file(filePath);
             });
           }
