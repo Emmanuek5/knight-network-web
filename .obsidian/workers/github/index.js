@@ -36,7 +36,6 @@ class Github {
   handleWebhook(req, res) {
     const token = req.params.token;
     const headers = req.headers;
-    console.log(headers);
     if (token !== this.token) {
       return res.status(401).json({ error: "Unauthorized" });
     }
