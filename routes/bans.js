@@ -26,6 +26,8 @@ router.post("/create", (req, res) => {
       isPermanent: isPermanentBoolean,
     });
 
+    console.log(newBan);
+
     if (!newBan) {
       res.status(400).send(newBan[1]);
       return;
