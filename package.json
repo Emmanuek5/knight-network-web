@@ -1,14 +1,21 @@
 {
   "name": "create-obsidian-engine",
-  "version": "1.0.1",
+  "version": "1.2.1",
   "description": "A Super fast render engine for simple web developers",
   "main": "index.js",
   "bin": ".obsidian/scripts/bin.js",
   "scripts": {
     "test": "nodemon .obsidian/scripts/test.js",
-    "dev": "nodemon .obsidian/server/index.js ",
     "start": "obsidian-runner run",
-    "build": "node .obsidian/scripts/build.js"
+    "install-dev": "node .obsidian/scripts/install.js",
+    "build": "node .obsidian/scripts/build.js",
+    "serve": "node .obsidian/scripts/serve.js ",
+    "app": "node .obsidian/scripts/app.js ",
+    "package": "node .obsidian/scripts/app-package.js",
+    "app:serverless": "node .obsidian/scripts/app.js --no-server",
+    "app:packager": "electron-forge package",
+    "app:make": "electron-forge make",
+    "app:publish": "electron-forge publish"
   },
   "keywords": [
     "render",
@@ -22,21 +29,28 @@
   "author": "blueobsidian",
   "license": "MIT",
   "dependencies": {
+    "adm-zip": "^0.5.10",
     "axios": "^1.5.0",
     "body-parser": "^1.20.2",
-    "busboy": "^1.6.0",
-    "compression": "^1.7.4",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
-    "formidable": "^3.5.1",
     "html": "^1.0.0",
     "mongoose": "^7.5.2",
     "mysql": "^2.18.1",
+    "ncp": "^2.0.0",
     "nodemon": "^3.0.1",
     "obsidian-runner": "^1.0.9",
     "readme-md-generator": "^1.0.0",
     "uuid": "^9.0.1",
     "zlib": "^1.0.5"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.4.2",
+    "@electron-forge/maker-deb": "^6.4.2",
+    "@electron-forge/maker-rpm": "^6.4.2",
+    "@electron-forge/maker-squirrel": "^6.4.2",
+    "@electron-forge/maker-zip": "^6.4.2",
+    "electron": "^27.0.4"
   }
 }
