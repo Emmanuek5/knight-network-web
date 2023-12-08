@@ -1,10 +1,12 @@
 const fs = require("fs");
 const path = require("path");
 const { RenderEngines } = require("../utils/Engines");
+const zlib = require("zlib");
 // lib/response.js
 class Response {
   constructor(httpResponse) {
     this.response = httpResponse;
+    this.req_headers = {};
     this.statusCode = 200; // Default status code is 200 OK
     this.headers = {
       "Content-Type": "text/html",
@@ -19,6 +21,18 @@ class Response {
     this.renderedFile = "";
     this.viewEngine = "html";
     this.body = "";
+  }
+
+  compress() {
+    const acceptEncoding = this.req_headers["accept-encoding"];
+
+    if (!acceptEncoding || !acceptEncoding.includes("gzip")) {
+      return this.body;
+    }
+
+    this.setHeader("Content-Encoding", "gzip");
+    this.body = zlib.gzipSync(this.body);
+    return this.body;
   }
 
   setStatus(statusCode) {
@@ -91,8 +105,8 @@ class Response {
   file(filePath) {
     if (fs.existsSync(filePath)) {
       this.body = fs.readFileSync(filePath);
-      this.rendered = true;
-      this.setHeader("Content-Type", "application/octet-stream"); // Set the appropriate content type based on the file type
+      this.compress(); // Use the compress function
+      this.setHeader("Content-Type", "application/octet-stream");
       this.response.writeHead(this.statusCode, this.headers);
       this.response.end(this.body);
     } else {
@@ -132,6 +146,11 @@ class Response {
       this.response.end(this.body);
       return this;
     }
+  }
+
+  end() {
+    this.response.end();
+    return this;
   }
 }
 

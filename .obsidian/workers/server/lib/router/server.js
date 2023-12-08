@@ -10,6 +10,7 @@ const querystring = require("querystring");
 const COOKIES_DIR = path.join(process.cwd(), ".obsidian/cookies");
 const uuid = require("uuid");
 const sessions = [];
+const zlib = require("zlib"); //
 class Server extends event.EventEmitter {
   constructor(viewEngine) {
     super();
@@ -29,6 +30,7 @@ class Server extends event.EventEmitter {
     const response = new Response(res);
 
     response.viewEngine = this.viewEngine;
+    response.req_headers = request.headers;
 
     // Record the start time when the request is received
     const startTime = new Date();
@@ -255,6 +257,7 @@ class Server extends event.EventEmitter {
                 "Expires",
                 new Date(Date.now() + 31536000000).toUTCString()
               );
+
               res.file(filePath);
             });
           }
