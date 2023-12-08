@@ -8,6 +8,11 @@ router.basePath = "/ban";
 router.post("/create", (req, res) => {
   const { username, reason, expiry, isPermanent, uuid } = req.body;
 
+  if (username === undefined || reason === undefined || expiry === undefined) {
+    res.status(400).send("Missing fields");
+    return;
+  }
+
   // Convert isPermanent to boolean
   const isPermanentBoolean = Boolean(isPermanent);
   const id = md5(username);
