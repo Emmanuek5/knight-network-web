@@ -8,7 +8,10 @@ class Build {
     this.distDir = process.cwd() + "/dist"; // Set your destination (dist) directory
     this.scriptsDir = process.cwd() + "/public/js"; // Set your scripts directory
     this.stylesDir = process.cwd() + "/public/css"; // Set your styles directory
-    this.pagesdistDir = process.cwd() + "/dist/"; // Set your destination (dist) directory
+    this.assetsDir = process.cwd() + "/assets"; // Set your assets directory
+    this.pagesdistDir = process.cwd() + "/dist/views/"; // Set your destination (dist) directory
+    this.publicDir = process.cwd() + "/public";
+
     this.renderEngines = new RenderEngines();
   }
 
@@ -39,11 +42,21 @@ class Build {
         // Recursively build pages in subdirectories with the correct dist folder
         this.buildPages(sourceItemPath, distItemPath);
       } else if (stats.isFile() && path.extname(item) === ".html") {
-        // If it's an HTML file, render and build the page
+        // If it's an HTML file, change the file extension to ".ejs"
+        const newDistItemPath = distItemPath.replace(".html", ".ejs");
+
         // Create a folder structure in the dist directory based on the source folder
         const relativePath = path.relative(this.sourceDir, sourceItemPath);
         const folderPath = path.dirname(relativePath);
-        distItemPath = path.join(this.pagesdistDir, folderPath, item);
+
+        // Adjust the distItemPath to include the correct folder structure
+        distItemPath = path.join(
+          this.pagesdistDir,
+          folderPath,
+          path.basename(newDistItemPath)
+        );
+
+        // Render and build the page with the new file extension
         this.renderPage(sourceItemPath, distItemPath);
       }
     });
@@ -69,7 +82,7 @@ class Build {
 
     console.log(fileName);
 
-    const content = this.renderEngines.htmlRenderer(fileName, {});
+    const content = this.renderEngines.htmlRenderer(fileName, {}, "build");
     fs.writeFileSync(distFilePath, content);
   }
 
@@ -80,6 +93,39 @@ class Build {
 
   buildALLStyles() {
     this.copyFolder(this.stylesDir, path.join(this.distDir, "styles"));
+  }
+
+  buildAllAssets() {
+    this.copyFolder(this.assetsDir, path.join(this.distDir, "assets"));
+  }
+
+  buildAllPublic() {
+    this.copyFolder(this.publicDir, path.join(this.distDir, "public"));
+  }
+
+  setUpNewServer() {
+    const default_server_code = fs.readFileSync(
+      path.join(__dirname, "default_express.js"),
+      "utf-8"
+    );
+
+    const server_code = default_server_code;
+    const dist_server_code_path = path.join(this.distDir, "index.js");
+    const default_package_json = {
+      dependencies: {
+        express: "4.17.1",
+        ejs: "3.1.6",
+      },
+      scripts: {
+        start: "node index.js",
+      },
+    };
+
+    fs.writeFileSync(
+      path.join(this.distDir, "package.json"),
+      JSON.stringify(default_package_json, null, 2)
+    );
+    fs.writeFileSync(dist_server_code_path, server_code);
   }
 
   copyFolder(src, dest) {

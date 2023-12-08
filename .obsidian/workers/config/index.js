@@ -70,6 +70,17 @@ class Config {
           secret: crypto.randomBytes(64).toString("hex"), // Include this line in the JSDoc
         },
       },
+      electron: {
+        version: "27.0.4",
+        enabled: true,
+        preload: "pages/preload.js",
+        modules: [
+          {
+            name: "main",
+            file: "./index.js",
+          },
+        ],
+      },
     };
   }
 

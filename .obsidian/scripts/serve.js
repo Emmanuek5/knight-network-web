@@ -21,4 +21,22 @@ builder.buildAllPublic();
 builder.setUpNewServer();
 let end = new Date().getTime();
 logger("Build Completed in " + (end - start) + "ms");
+try {
+  let args = ["index.js"];
+  let process = spawn("node", args, { cwd: buildPath });
+  process.stdout.on("data", (data) => {
+    logger(data.toString().trim());
+  });
+  process.stderr.on("data", (data) => {
+    logger(data.toString().trim());
+  });
 
+  process.on("error", function (error) {
+    logger(error);
+  });
+  process.on("exit", function (code, signal) {
+    logger("Build process exited with code: " + code);
+  });
+} catch (error) {
+  console.log(error);
+}

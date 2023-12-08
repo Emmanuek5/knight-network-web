@@ -510,7 +510,6 @@ class RenderEngines {
       if (options.scripts.length > 0) {
         for (const script of options.scripts) {
           const scriptPath = path.join(this.scriptsDir, script);
-          console.log(scriptPath);
           try {
             layoutContent = layoutContent.replace(
               /<\/body>/i,

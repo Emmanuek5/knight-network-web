@@ -3,4 +3,10 @@ data
 dist
 cookies
 obsidian.config.json
+cache
+**/electron/assets
+**/electron/public
+**/electron/pages
+**/electron/electron-**
+out
 ```

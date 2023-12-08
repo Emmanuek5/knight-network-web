@@ -9,6 +9,30 @@ class Github {
     this.app.post("/webhook/:token", this.handleWebhook.bind(this));
   }
 
+  inatialiseRepoIfNoneExists() {
+    try {
+      // Check if the repository is already initialized
+      execSync("git rev-parse --is-inside-work-tree", { stdio: "ignore" });
+
+      console.log("Repository is already initialized");
+    } catch (error) {
+      if (error.status === 128) {
+        // The error code 128 indicates that the command failed because it's not inside a Git repository
+        console.log("Initializing repository...");
+
+        try {
+          execSync("git init");
+          console.log("Repository initialized successfully");
+        } catch (initError) {
+          console.error("Error initializing repository:", initError.message);
+        }
+      } else {
+        // Handle other errors
+        console.error("Error checking repository:", error.message);
+      }
+    }
+  }
+
   handleWebhook(req, res) {
     const token = req.params.token;
     const headers = req.headers;
@@ -32,8 +56,8 @@ class Github {
 
   setGlobalPullConfig(branch = "main") {
     try {
-      execSync(`git config --global pull.rebase false`);
-      execSync(`git config --global pull.ff only`);
+      execSync(`git config --local pull.rebase false`);
+      execSync(`git config --local pull.ff only`);
       console.log(
         `Global pull configuration set successfully for branch ${branch}`
       );

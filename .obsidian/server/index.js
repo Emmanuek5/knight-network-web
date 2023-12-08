@@ -32,9 +32,9 @@ if (!config.get("db_url") === undefined && config.get("db_url") !== "") {
 if (config.get("auto_update") === true) {
   const { Github } = require("../workers/github");
   const github = new Github(app, config.get("github_webhook_secret"));
+  github.inatialiseRepoIfNoneExists();
   github.setGlobalPullConfig();
 }
-
 const database = new Database(url, portdb, remote);
 process.env.VIEWS_PATH = pagesPath;
 process.env.VIEW_ENGINE = config.get("view_engine");

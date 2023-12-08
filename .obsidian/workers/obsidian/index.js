@@ -80,7 +80,6 @@ function startNodeProcess() {
       nodeProcess = null;
       processExited = true;
       logger(COLORS.RED_TEXT + "ENGINE EXITED. BYE BYE");
-      process.exit(0);
     });
   }
 }
