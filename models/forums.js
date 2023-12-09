@@ -30,6 +30,26 @@ table.setSchema({
     type: "string",
     required: true,
   },
+  likes: {
+    type: "number",
+    required: true,
+    default: 0,
+  },
+  dislikes: {
+    type: "number",
+    required: true,
+    default: 0,
+  },
+  likedBy: {
+    type: "object",
+    required: true,
+    default: [],
+  },
+  dislikedBy: {
+    type: "object",
+    required: true,
+    default: [],
+  },
 });
 
 module.exports = table;

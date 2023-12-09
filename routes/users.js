@@ -2,6 +2,7 @@ const { Router } = require("../modules");
 const router = new Router();
 const userModel = require("../models/users");
 const path = require("path");
+const forumPosts = require("../models/forums");
 
 router.basePath = "/user";
 

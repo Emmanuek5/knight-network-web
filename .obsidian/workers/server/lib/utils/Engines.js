@@ -439,6 +439,7 @@ class RenderEngines {
     if (!this.isFaviconinContent(content)) {
       content = this.addFaviconToContent(content);
     }
+    content = this.addDefaultCSStToContent(content);
 
     content = this.addDefaultJavaScriptToContent(content);
 
@@ -476,6 +477,7 @@ class RenderEngines {
           const pattern = new RegExp(`<<\\$${key}>>`, "g");
           layoutContent = layoutContent.replace(pattern, variable);
         }
+        layoutContent = this.addDefaultCSStToContent(layoutContent);
         layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
       } else {
         layoutContent = content;
@@ -578,6 +580,7 @@ class RenderEngines {
           const pattern = new RegExp(`<<\\$${key}>>`, "g");
           layoutContent = layoutContent.replace(pattern, variable);
         }
+        layoutContent = this.addDefaultCSStToContent(layoutContent);
         layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
       } else {
         layoutContent = content;
@@ -667,9 +670,21 @@ class RenderEngines {
   addDefaultJavaScriptToContent(content) {
     // Create a regular expression to find the </head> tag in a case-insensitive manner
     const headTagRegex = /<\/head>/i;
-    const scripts = ["server/defaults.js", "server/bundler.js"];
+    const scripts = ["/server/defaults.js", "/server/bundler.js"];
     const scriptTags = scripts.map((script) => {
       return `<script src="${script}"></script>`;
+    });
+
+    // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;
+    return content.replace(headTagRegex, `${scriptTags.join("\n")}\n</head>`);
+  }
+
+  addDefaultCSStToContent(content) {
+    // Create a regular expression to find the </head> tag in a case-insensitive manner
+    const headTagRegex = /<\/head>/i;
+    const scripts = ["/server/default.css"];
+    const scriptTags = scripts.map((script) => {
+      return `<link rel="stylesheet" href="${script}">  `;
     });
 
     // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;

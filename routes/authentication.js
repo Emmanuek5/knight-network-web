@@ -49,7 +49,6 @@ router.post("/signup", (req, res) => {
   const { username, password, email } = req.body;
 
   const data = userModel.findByOr({ username, email });
-  console.log(data);
   if (data.length > 0) {
     res.status(400).json({ error: true, message: "Username already exists" });
     return;

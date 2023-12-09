@@ -16,6 +16,16 @@ table.setSchema({
     required: true,
     default: 0,
   },
+  likedPosts: {
+    type: "object",
+    required: true,
+    default: [],
+  },
+  dislikedPosts: {
+    type: "object",
+    required: true,
+    default: [],
+  },
   rank: {
     type: "string",
     required: true,

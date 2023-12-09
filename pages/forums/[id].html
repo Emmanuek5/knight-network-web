@@ -95,15 +95,23 @@
   .comment p {
     color: #000;
   }
+
+  a {
+    text-decoration: none;
+    color: #3498db;
+  }
 </style>
+
 <input type="hidden" name="forum_id" value="<<$id>>" />
 <div class="forum_post_view_container">
   <div class="top">
     <img src="" alt="" />
     <h2>Username</h2>
     <p>Post Date</p>
-    <button>Like</button>
-    <button>Dislike</button>
+    <p>Likes</p>
+    <p>Dislikes</p>
+    <button onclick="like()" id="likeButtonID">Like</button>
+    <button onclick="dislike()" id="dislikeButtonID">Dislike</button>
     <button>Report</button>
   </div>
   <div class="forum_post_content">
@@ -120,6 +128,17 @@
   const id = document.querySelector("input[name='forum_id']").value;
   const forumPostView = document.querySelector(".forum_post_view_container");
   const route = "/api/forums/";
+  const title = document.querySelector(".forum_post_content h1");
+  const userImage = document.querySelector(".top img");
+  const username = document.querySelector(".top h2");
+  const postDate = document.querySelector(".top p");
+  const likeButton = document.getElementById("likeButtonID");
+  const dislikeButton = document.getElementById("dislikeButtonID");
+  const reportButton = document.querySelector(".top button:nth-child(3)");
+  const likeCount = document.querySelector(".top p:nth-child(4)");
+  const dislikeCount = document.querySelector(".top p:nth-child(5)");
+  let hasLiked = false;
+  let hasDisliked = false;
 
   fetch(route + id)
     .then((response) => response.json())
@@ -132,23 +151,94 @@
         }, 3000);
       }
       // Update HTML with data
-      const title = document.querySelector(".forum_post_content h1");
-      const userImage = document.querySelector(".top img");
-      const username = document.querySelector(".top h2");
-      const postDate = document.querySelector(".top p");
-      const likeButton = document.querySelector(".top button:nth-child(1)");
-      const dislikeButton = document.querySelector(".top button:nth-child(2)");
-      const reportButton = document.querySelector(".top button:nth-child(3)");
-      const postContent = document.querySelector(".forum_post_content p");
 
-      // Set values based on the data from the API
-      userImage.src = data.userimageurl;
-      title.textContent = data.title;
-      username.textContent = data.username;
-      postDate.textContent = formatDate(data.date); // Assuming you have a function to format the date
-      postContent.textContent = data.content;
+      const postContent = document.querySelector(".forum_post_content p");
+      // Set values based on data from the API
+      userImage.src = data.userimageurl || ""; // Provide default/fallback value
+      title.textContent = data.title || "";
+      likeCount.textContent = data.likes || 0; // Provide a default value in case the property is missing or undefined
+      dislikeCount.textContent = data.dislikes || 0; // Provide a default value in case the property is missing or undefined
+      username.innerHTML = `<a href="/user/${data.userid}">${data.username}</a>`;
+      postDate.textContent = formatDate(data.date) || ""; // Assuming you have formatDate function
+      postContent.textContent = data.content || "";
+
+      fetch(route + "hasliked/" + id)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.liked) {
+            likeButton.style.backgroundColor = "#e74c3c";
+            hasLiked = true;
+          }
+        });
+
+      fetch(route + "hasdisliked/" + id)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.disliked) {
+            dislikeButton.style.backgroundColor = "#e74c3c";
+            hasDisliked = true;
+          }
+        });
     });
 
+  function updateCounts() {
+    // Refetch the post to get updated counts
+    fetch(route + id)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          modal(
+            "",
+            "Error",
+            "There was an error updating counts from the server" + data.error
+          );
+        } else {
+          likeCount.textContent = data.likes || 0;
+          dislikeCount.textContent = data.dislikes || 0;
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching update counts:", error);
+      });
+  }
+
+  function like() {
+    if (!hasLiked) {
+      fetch(route + "like/" + id, {
+        method: "POST",
+      })
+        .then((res) => {
+          if (res.ok) {
+            updateCounts(); // Update counts after the server confirms the like
+          } else {
+            modal(
+              "",
+              "You already liked this post",
+              "You can only like a post once"
+            );
+          }
+        })
+        .catch((error) => {});
+    }
+  }
+
+  function dislike() {
+    if (!hasDisliked) {
+      fetch(route + "dislike/" + id, {
+        method: "POST",
+      }).then((res) => {
+        if (res.ok) {
+          updateCounts(); // Update counts after the server confirms the dislike
+        } else {
+          modal(
+            "",
+            "You already disliked this post",
+            "You can only dislike a post once"
+          );
+        }
+      });
+    }
+  }
   function formatDate(date) {
     const options = {
       year: "numeric",

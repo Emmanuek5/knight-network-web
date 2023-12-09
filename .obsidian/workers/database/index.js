@@ -587,6 +587,20 @@ class Table extends EventEmitter {
     const schemaKeys = Object.keys(this.schema);
     const rowKeys = Object.keys(row);
 
+    //crosscheck schema and row keys let itc heck if the key has a default value
+    schemaKeys.forEach((key) => {
+      if (
+        this.schema[key].required &&
+        !rowKeys.includes(key) &&
+        row[key] === undefined &&
+        this.schema[key].default === undefined
+      ) {
+        console.error(
+          `Column '${key}' is required but not provided in the inserted row.`
+        );
+        return false;
+      }
+    });
     for (const key in this.schema) {
       // Check if the key is required and not provided (unless it has a default)
       if (
@@ -736,6 +750,7 @@ class Table extends EventEmitter {
   }
 
   save() {
+    this.emit("save");
     return true;
   }
   /**

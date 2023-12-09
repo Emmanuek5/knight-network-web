@@ -61,6 +61,101 @@ router.get("/:id", (req, res) => {
   }
 });
 
+router.post("/like/:id", (req, res) => {
+  const { id } = req.params;
+  const user = req.session.user;
+  const data = forumsModel.findOne({ id });
+  const userData = usersModel.findOne({ id: user.id });
+  if (!user) {
+    res.status(403).json({ error: true, message: "You must be logged in" });
+    return;
+  }
+
+  if (userData.likedPosts.includes(id)) {
+    res.status(400).json({ error: true, message: "Post already liked" });
+    return;
+  }
+
+  forumsModel.findOneAndUpdate({ id }, { likes: data.likes + 1 });
+  data.likedBy.push(user.id);
+  userData.likedPosts.push(id);
+  usersModel.findOneAndUpdate(
+    { id: user.id },
+    { likedPosts: userData.likedPosts }
+  );
+
+  forumsModel.findOneAndUpdate({ id }, { likedBy: data.likedBy });
+  res.status(200).json({
+    message: "Forum post liked successfully",
+    success: true,
+  });
+});
+
+router.post("/dislike/:id", (req, res) => {
+  const { id } = req.params;
+  const user = req.session.user;
+  const data = forumsModel.findOne({ id });
+  const userData = usersModel.findOne({ id: user.id });
+
+  if (!user) {
+    res.status(403).json({ error: true, message: "You must be logged in" });
+    return;
+  }
+  if (userData.dislikedPosts.includes(id)) {
+    res.status(400).json({ error: true, message: "Post already disliked" });
+    return;
+  }
+
+  forumsModel.findOneAndUpdate({ id }, { dislikes: data.dislikes + 1 });
+  data.dislikedBy.push(user.id);
+  userData.dislikedPosts.push(id);
+  usersModel.findOneAndUpdate(
+    { id: user.id },
+    { dislikedPosts: userData.dislikedPosts }
+  );
+
+  forumsModel.findOneAndUpdate({ id }, { dislikedBy: data.dislikedBy });
+  res.status(200).json({
+    message: "Forum post disliked successfully",
+    success: true,
+  });
+});
+
+router.get("/hasliked/:id", (req, res) => {
+  const { id } = req.params;
+  const user = req.session.user;
+  const data = forumsModel.findOne({ id });
+  const userData = usersModel.findOne({ id: user.id });
+
+  if (!user) {
+    res.status(403).json({ error: true, message: "You must be logged in" });
+    return;
+  }
+  if (userData.likedPosts.includes(id)) {
+    res.status(200).json({ liked: true });
+  } else {
+    res.status(200).json({ liked: false });
+  }
+});
+
+router.get("/hasdisliked/:id", (req, res) => {
+  const { id } = req.params;
+  const user = req.session.user;
+  const data = forumsModel.findOne({ id });
+  const userData = usersModel.findOne({ id: user.id });
+
+  if (!user) {
+    res.status(403).json({ error: true, message: "You must be logged in" });
+    return;
+  }
+
+  if (userData.dislikedPosts.includes(id)) {
+    res.status(200).json({ disliked: true });
+  } else {
+    res.status(200).json({ disliked: false });
+  }
+});
+
 function md5(data) {
   return crypto.createHash("md5").update(data).digest("hex");
 }
