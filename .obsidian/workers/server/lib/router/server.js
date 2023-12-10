@@ -254,21 +254,20 @@ class Server extends event.EventEmitter {
               //check if the file is a js, css or html
               const ext = path.extname(filePath);
               if (ext === ".js" || ext === ".css" || ext === ".html") {
-                //reduce cache time to 10 minutes
-                res.setHeader("Cache-Control", "public, max-age=600");
+                //reduce cache time to 1 day
+                res.setHeader("Cache-Control", "public, max-age=86400");
                 res.setHeader(
                   "Expires",
-                  new Date(Date.now() + 600000).toUTCString()
+                  new Date(Date.now() + 86400000).toUTCString()
                 );
-                res.file(filePath);
 
                 return;
               }
-              //set cache time to 1 day
-              res.setHeader("Cache-Control", "public, max-age=86400");
+              //set cache time to 1 month
+              res.setHeader("Cache-Control", "public, max-age=2592000");
               res.setHeader(
                 "Expires",
-                new Date(Date.now() + 86400000).toUTCString()
+                new Date(Date.now() + 2592000000).toUTCString()
               );
               res.file(filePath);
             });
