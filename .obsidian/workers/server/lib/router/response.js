@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const { RenderEngines } = require("../utils/Engines");
 const zlib = require("zlib");
-const { TextEncoder, TextDecoder } = require("text-encoding-utf-8");
 // lib/response.js
 class Response {
   constructor(httpResponse) {
@@ -23,7 +22,6 @@ class Response {
     this.viewEngine = "html";
     this.body = "";
   }
-
   async compress() {
     const acceptEncoding = this.req_headers["accept-encoding"];
 
@@ -32,29 +30,7 @@ class Response {
     }
 
     this.setHeader("Content-Encoding", "gzip");
-
-    try {
-      const encoder = new TextEncoder();
-      const encodedText = encoder.encode(this.body);
-
-      // Use zlib.gzip with asynchronous compression
-      this.body = await new Promise((resolve, reject) => {
-        zlib.gzip(encodedText, (error, compressed) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(compressed);
-          }
-        });
-      });
-
-      // Decode the compressed content
-      this.body = new TextDecoder().decode(this.body);
-    } catch (error) {
-      console.error("Error compressing content:", error);
-      // Handle the error or return the uncompressed content
-    }
-
+    this.body = zlib.gzipSync(this.body);
     return this.body;
   }
 
@@ -128,6 +104,7 @@ class Response {
     if (fs.existsSync(filePath)) {
       this.body = fs.readFileSync(filePath);
       this.compress();
+
       this.setHeader("Content-Type", "application/octet-stream");
       this.response.writeHead(this.statusCode, this.headers);
       this.response.end(this.body);
