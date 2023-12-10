@@ -240,5 +240,19 @@ function message(
   }, animationDelay);
 }
 
-// Add styles for .message-container similar to the .error-container but with green background.
-/* ...existing .message-container styles with updates to background color... */
+function notify(title, content, image, delay = 1000) {
+  Notification.requestPermission((perm) => {
+    if (perm == "granted") {
+      console.log("Permission is granted");
+      let options = {};
+      let notification = new Notification(title, {
+        body: content,
+        icon: image,
+      });
+      console.log(notification);
+    } else {
+      console.error("Permission is not granted");
+      return false;
+    }
+  });
+}
