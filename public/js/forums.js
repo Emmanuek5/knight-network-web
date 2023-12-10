@@ -1,6 +1,6 @@
 //the html for the forum page is in /pages/forums/new.html
 const route = "/api/forums/new";
-const route2 = "/api/forums/list";
+const route2 = "/api/forums/list/1/date";
 
 const currentlocation = window.location.href;
 
@@ -46,7 +46,7 @@ if (!currentlocation.includes("new")) {
           postTitle.appendChild(postLink);
 
           const postContent = document.createElement("p");
-          postContent.textContent = post.content;
+          postContent.textContent = post.description + ".....";
 
           // Append everything to the post container
           postContainer.appendChild(userBlock);

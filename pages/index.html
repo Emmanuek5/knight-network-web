@@ -84,6 +84,22 @@
   }
 </style>
 <script>
+  // Example usage for input modal with multiple inputs
+  modal("input", "Enter Data", "Please enter data:", {
+    inputs: [
+      { name: "name", label: "Your Name", placeholder: "John Doe" },
+      {
+        name: "email",
+        label: "Email Address",
+        type: "email",
+        placeholder: "john@example.com",
+      },
+      { name: "age", label: "Your Age", type: "number", placeholder: "25" },
+    ],
+    submitLabel: "Submit",
+  }).then((response) => {
+    console.log(response); // Will log an object with entered values for each input field
+  });
   function copys(text) {
     if (copy("play.knight-network.xyz")) {
       message("copied to clipboard", "top");

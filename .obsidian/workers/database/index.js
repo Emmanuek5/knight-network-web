@@ -655,7 +655,7 @@ class Table extends EventEmitter {
     this.data.push(row);
     this.addId();
     this.emit("save");
-    return this;
+    return row;
     // Emit the 'save' event after inserting a row
   }
 
@@ -668,6 +668,8 @@ class Table extends EventEmitter {
   }
 
   selectAll() {
+    const data = Object.values(this.data);
+    return data;
     return this.data;
   }
 
@@ -690,7 +692,11 @@ class Table extends EventEmitter {
       Object.keys(query).length === 0 ||
       query == {}
     ) {
-      return this.data;
+      const detached_data = [];
+      for (const row of this.data) {
+        detached_data.push({ ...row });
+      }
+      return [...detached_data]; // Return a shallow copy of the data array
     }
     const results = [];
     for (const row of this.data) {
@@ -702,10 +708,10 @@ class Table extends EventEmitter {
         }
       }
       if (match) {
-        results.push(row); // Stringify the row before pushing it
+        results.push({ ...row }); // Create a new object for each row
       }
     }
-    return results;
+    return results; // Return the results array with new objects
   }
 
   /**

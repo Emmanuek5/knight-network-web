@@ -36,20 +36,40 @@ router.post("/new", (req, res) => {
   }
 });
 
-router.get("/list", (req, res) => {
-  const forumPosts = forumsModel.find({});
-  forumPosts.forEach((forumPost) => {
-    const userid = forumPost.userid;
-    const data = usersModel.findOne({ id: userid });
-    if (data) {
-      forumPost.username = data.username;
-      forumPost.userimageurl = data.image;
+router.get("/list/:page/:by", async (req, res) => {
+  try {
+    const forumPosts = forumsModel.find({});
+
+    const { page, by } = req.params;
+    let pageInt = parseInt(page);
+    let limit = 20;
+
+    if (by === "likes") {
+      forumPosts.sort((a, b) => b.likes - a.likes);
+    } else if (by === "date") {
+      forumPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
     } else {
-      forumPost.username = "Deleted User";
-      forumPost.userimage = "/assets/user.png";
+      forumPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
     }
-  });
-  res.status(200).json(forumPosts);
+
+    if (pageInt > 0) {
+      forumPosts.slice((pageInt - 1) * limit, pageInt * limit);
+    }
+
+    for (const post of forumPosts) {
+      let userid = post.userid;
+      let user = await usersModel.findOne({ id: userid }); // Use await for asynchronous operation
+      if (user) {
+        post.username = user.username;
+        post.userimageurl = user.image;
+      }
+    }
+
+    res.status(200).json(forumPosts);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 router.get("/:id", (req, res) => {
