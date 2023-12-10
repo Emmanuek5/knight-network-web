@@ -669,7 +669,7 @@ class RenderEngines {
     const headTagRegex = /<\/head>/i;
     const scripts = ["/server/defaults.js", "/server/bundler.js"];
     const scriptTags = scripts.map((script) => {
-      return `<script src="${script}" defer></script>`;
+      return `<script src="${script}"></script>`;
     });
 
     // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;

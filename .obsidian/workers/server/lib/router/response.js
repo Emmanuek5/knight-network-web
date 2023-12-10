@@ -70,6 +70,7 @@ class Response {
       ? `${this.headers["Set-Cookie"]}; ${cookie}`
       : cookie;
   }
+
   status(statusCode) {
     this.statusCode = statusCode;
     return this;

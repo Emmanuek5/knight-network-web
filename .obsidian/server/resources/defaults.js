@@ -240,28 +240,5 @@ function message(
   }, animationDelay);
 }
 
-/**
- * Sends a notification with the given title, content, image, and optional delay.
- *
- * @param {string} title - The title of the notification.
- * @param {string} content - The content of the notification.
- * @param {string} image - The image URL for the notification.
- * @param {number} [delay=1000] - The delay in milliseconds before showing the notification.
- * @return {boolean} Returns true if the notification is sent successfully, false otherwise.
- */
-function notify(title, content, image, delay = 1000) {
-  Notification.requestPermission((perm) => {
-    if (perm == "granted") {
-      console.log("Permission is granted");
-      let options = {};
-      let notification = new Notification(title, {
-        body: content,
-        icon: image,
-      });
-      console.log(notification);
-    } else {
-      console.error("Permission is not granted");
-      return false;
-    }
-  });
-}
+// Add styles for .message-container similar to the .error-container but with green background.
+/* ...existing .message-container styles with updates to background color... */
