@@ -242,18 +242,3 @@ function message(
 
 // Add styles for .message-container similar to the .error-container but with green background.
 /* ...existing .message-container styles with updates to background color... */
-document.addEventListener("DOMContentLoaded", () => {
-  let url = "/server/defaults.css";
-  let style = "";
-
-  fetch(url)
-    .then((response) => {
-      return response.text();
-    })
-    .then((text) => {
-      style = text;
-      const styleElement = document.createElement("style");
-      styleElement.textContent = style;
-      document.head.appendChild(styleElement);
-    });
-});

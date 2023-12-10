@@ -439,9 +439,6 @@ class RenderEngines {
     if (!this.isFaviconinContent(content)) {
       content = this.addFaviconToContent(content);
     }
-    content = this.addDefaultCSStToContent(content);
-
-    content = this.addDefaultJavaScriptToContent(content);
 
     //check  for the <script> tag and get the content of the tag
     const scriptRegex = /<script>([\s\S]*?)<\/script>/g;
@@ -681,14 +678,17 @@ class RenderEngines {
 
   addDefaultCSStToContent(content) {
     // Create a regular expression to find the </head> tag in a case-insensitive manner
-    const headTagRegex = /<head>/i;
-    const scripts = ["/server/defaults.css"];
-    const scriptTags = scripts.map((script) => {
-      return `<link rel="stylesheet" href="${script}">  `;
-    });
+    const headTagRegex = /<\/head>/i;
+    const defaultServerPath = path.join(process.cwd(), ".obsidian", "server");
+    const styles = ["/resources/defaults.css"];
+    const data = fs.readFileSync(
+      path.join(defaultServerPath, "resources", "defaults.css"),
+      "utf8"
+    );
 
-    // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;
-    return content.replace(headTagRegex, `<head>\n${scriptTags.join("\n")}`);
+    const styleTag = `<style>${data}</style>`;
+    content = content.replace(headTagRegex, `${styleTag}\n$&`); // Use $& to include the matched </head> tag
+    return content; // Return the modified content
   }
 
   isFaviconinContent(content) {

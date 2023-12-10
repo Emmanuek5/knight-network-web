@@ -22,8 +22,7 @@ class Response {
     this.viewEngine = "html";
     this.body = "";
   }
-
-  compress() {
+  async compress() {
     const acceptEncoding = this.req_headers["accept-encoding"];
 
     if (!acceptEncoding || !acceptEncoding.includes("gzip")) {
@@ -71,7 +70,6 @@ class Response {
       ? `${this.headers["Set-Cookie"]}; ${cookie}`
       : cookie;
   }
-
   status(statusCode) {
     this.statusCode = statusCode;
     return this;
@@ -102,10 +100,10 @@ class Response {
     return this;
   }
 
-  file(filePath) {
+  async file(filePath) {
     if (fs.existsSync(filePath)) {
       this.body = fs.readFileSync(filePath);
-      this.body = this.compress();
+      this.compress();
       this.setHeader("Content-Type", "application/octet-stream");
       this.response.writeHead(this.statusCode, this.headers);
       this.response.end(this.body);
