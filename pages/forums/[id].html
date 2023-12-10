@@ -222,8 +222,9 @@
             "There was an error updating counts from the server" + data.error
           );
         } else {
-          likeCount.textContent = data.likes || 0;
-          dislikeCount.textContent = data.dislikes || 0;
+          document.getElementById("likeCount").textContent = data.likes || 0;
+          document.getElementById("dislikeCount").textContent =
+            data.dislikes || 0;
         }
       })
       .catch((error) => {
