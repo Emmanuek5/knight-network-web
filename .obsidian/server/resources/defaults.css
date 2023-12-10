@@ -107,15 +107,54 @@
     /* a darker shade of danger color */
 }
 
+/* Additional styles for input modals */
+.input-container {
+    margin-top: 20px;
+}
+
+.input-container label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Style for the submit button in input modals */
+#modalSubmitButton {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    color: white;
+    background-color: #5bc0de;
+    /* Bootstrap 'info' color */
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 1px 1px 3px rgba(91, 192, 222, 0.6);
+    transition: background-color 0.3s ease;
+}
+
+#modalSubmitButton:hover {
+    background-color: #46b8da;
+    /* a darker shade of info color */
+}
+
 .error-container {
     position: fixed;
     padding: 1rem;
     background-color: #e74c3c;
-    max-width: 600px;/* or any maximum you'd prefer */
+    max-width: 600px;
+    /* or any maximum you'd prefer */
     /* Reddish */
     padding: 1rem;
-        /* Adjust padding as needed */
-        padding-right: 2.5rem;
+    /* Adjust padding as needed */
+    padding-right: 2.5rem;
     color: white;
     border-radius: 4px;
     z-index: 2000;
@@ -131,7 +170,7 @@
     transform: translateX(-100%);
     /* Start offscreen */
     transition: opacity 0.5s, transform 0.5s;
-        /* Consistent with JavaScript timeouts */
+    /* Consistent with JavaScript timeouts */
     /* Slide in animation */
 }
 
@@ -197,13 +236,13 @@
     transform: translateX(100%);
 }
 
-.message-container.top.right{
+.message-container.top.right {
     top: 1rem;
     right: 1rem;
     transform: translateX(100%);
 }
 
-.message-container.top.left{
+.message-container.top.left {
     top: 1rem;
     left: 1rem;
     transform: translateX(-100%);
@@ -222,4 +261,5 @@
     to {
         transform: translateX(100%);
         opacity: 0;
-    }}
+    }
+}

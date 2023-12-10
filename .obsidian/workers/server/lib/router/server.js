@@ -251,13 +251,19 @@ class Server extends event.EventEmitter {
           } else {
             // Serve the file
             this.addRoute(routePath, "GET", (req, res) => {
+              //check if the file is a js, css or html
+              const ext = path.extname(filePath);
+              if (ext === ".js" || ext === ".css" || ext === ".html") {
+                const content = fs.readFileSync(filePath, "utf8");
+                res.send(content);
+                return;
+              }
               //add content expiry
               res.setHeader("Cache-Control", "public, max-age=31536000");
               res.setHeader(
                 "Expires",
                 new Date(Date.now() + 31536000000).toUTCString()
               );
-
               res.file(filePath);
             });
           }

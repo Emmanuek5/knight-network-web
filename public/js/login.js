@@ -1,10 +1,9 @@
 const form = document.querySelector("form");
-const error = document.querySelector(".error");
+
 const inputs = document.querySelectorAll("input");
 const route1 = "/api/auth/login";
 const route2 = "/api/auth/signup";
 const currentlocation = window.location.href;
-console.log(authenticated);
 
 if (authenticated) {
   window.location = "/";
@@ -44,11 +43,7 @@ if (currentlocation.includes("signup")) {
       window.location = "/";
     } else {
       const { message } = result;
-      error.style.display = "block";
-      error.innerHTML = `<p>${message}</p>`;
-      setTimeout(() => {
-        error.style.display = "none";
-      }, 3000);
+      error(message, "top", 3000, "right");
     }
   });
 } else if (currentlocation.includes("login")) {
@@ -81,11 +76,7 @@ if (currentlocation.includes("signup")) {
       window.location = "/";
     } else {
       const { message } = result;
-      error.style.display = "block";
-      error.innerHTML = `<p>${message}</p>`;
-      setTimeout(() => {
-        error.style.display = "none";
-      }, 3000);
+      error(message, "top", 3000, "right");
     }
   });
 }

@@ -403,3 +403,28 @@
     background-color: #c9302c;
     /* a darker shade of danger color */
 }
+
+.error-container {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem;
+    background-color: #e74c3c;
+    /* Red */
+    color: white;
+    border-radius: 4px;
+    z-index: 2000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    /* So that mouse events pass through to elements below */
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.error-container.top {
+    top: 1rem;
+}
+
+.error-container.bottom {
+    bottom: 1rem;
+}

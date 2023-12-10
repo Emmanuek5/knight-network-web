@@ -105,7 +105,7 @@ class Response {
   file(filePath) {
     if (fs.existsSync(filePath)) {
       this.body = fs.readFileSync(filePath);
-      this.compress(); // Use the compress function
+      this.body = this.compress();
       this.setHeader("Content-Type", "application/octet-stream");
       this.response.writeHead(this.statusCode, this.headers);
       this.response.end(this.body);

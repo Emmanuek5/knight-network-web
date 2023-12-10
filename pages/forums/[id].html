@@ -100,6 +100,30 @@
     text-decoration: none;
     color: #3498db;
   }
+
+  /* Add this CSS to your existing styles */
+  .like-button.liked {
+    background-color: #e74c3c; /* Liked color */
+  }
+
+  .like-button.liked:hover {
+    background-color: #e74c3c; /* Liked color */
+  }
+
+  .dislike-button.disliked {
+    background-color: #e74c3c; /* Disliked color */
+  }
+
+  .dislike-button.disliked:hover {
+    background-color: #e74c3c; /* Disliked color */
+  }
+
+  .like-button,
+  .dislike-button {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Adjust spacing as needed */
+  }
 </style>
 
 <input type="hidden" name="forum_id" value="<<$id>>" />
@@ -108,10 +132,14 @@
     <img src="" alt="" />
     <h2>Username</h2>
     <p>Post Date</p>
-    <p>Likes</p>
-    <p>Dislikes</p>
-    <button onclick="like()" id="likeButtonID">Like</button>
-    <button onclick="dislike()" id="dislikeButtonID">Dislike</button>
+    <button onclick="like()" id="likeButtonID" class="like-button">
+      <span id="likeCount"></span>
+      <i class="fa fa-thumbs-up"></i>
+    </button>
+    <button onclick="dislike()" id="dislikeButtonID" class="dislike-button">
+      <span id="dislikeCount"></span>
+      <i class="fa fa-thumbs-down"></i>
+    </button>
     <button>Report</button>
   </div>
   <div class="forum_post_content">
@@ -156,8 +184,9 @@
       // Set values based on data from the API
       userImage.src = data.userimageurl || ""; // Provide default/fallback value
       title.textContent = data.title || "";
-      likeCount.textContent = data.likes || 0; // Provide a default value in case the property is missing or undefined
-      dislikeCount.textContent = data.dislikes || 0; // Provide a default value in case the property is missing or undefined
+      document.getElementById("likeCount").textContent = data.likes || 0;
+      document.getElementById("dislikeCount").textContent = data.dislikes || 0;
+
       username.innerHTML = `<a href="/user/${data.userid}">${data.username}</a>`;
       postDate.textContent = formatDate(data.date) || ""; // Assuming you have formatDate function
       postContent.textContent = data.content || "";
@@ -166,7 +195,7 @@
         .then((response) => response.json())
         .then((data) => {
           if (data.liked) {
-            likeButton.style.backgroundColor = "#e74c3c";
+            likeButton.classList.add("liked");
             hasLiked = true;
           }
         });
@@ -175,7 +204,7 @@
         .then((response) => response.json())
         .then((data) => {
           if (data.disliked) {
-            dislikeButton.style.backgroundColor = "#e74c3c";
+            dislikeButton.classList.add("disliked");
             hasDisliked = true;
           }
         });
@@ -209,7 +238,8 @@
       })
         .then((res) => {
           if (res.ok) {
-            updateCounts(); // Update counts after the server confirms the like
+            updateCounts();
+            likeButton.classList.add("liked"); // Apply liked style
           } else {
             modal(
               "",
@@ -228,7 +258,8 @@
         method: "POST",
       }).then((res) => {
         if (res.ok) {
-          updateCounts(); // Update counts after the server confirms the dislike
+          updateCounts();
+          dislikeButton.classList.add("disliked"); // Apply disliked style
         } else {
           modal(
             "",

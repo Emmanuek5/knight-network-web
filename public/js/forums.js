@@ -1,7 +1,7 @@
 //the html for the forum page is in /pages/forums/new.html
 const route = "/api/forums/new";
 const route2 = "/api/forums/list";
-const error = document.querySelector(".error");
+
 const currentlocation = window.location.href;
 
 if (!authenticated && currentlocation.includes("new")) {
@@ -14,7 +14,7 @@ if (!currentlocation.includes("new")) {
     .then((response) => response.json())
     .then((data) => {
       const result = data;
-      if (result) {
+      if (result.length > 0) {
         // Map posts into HTML elements
         result.forEach((post) => {
           const postContainer = document.createElement("div");
@@ -57,12 +57,7 @@ if (!currentlocation.includes("new")) {
           forumContainer.appendChild(postContainer);
         });
       } else {
-        // Handle error here
-        error.style.display = "block";
-        error.innerHTML = `<p>Error Getting Forum posts from the server</p>`;
-        setTimeout(() => {
-          error.style.display = "none";
-        }, 3000);
+        error("No posts found", "bottom", 3000, "left");
       }
     });
 } else {
@@ -85,11 +80,7 @@ if (!currentlocation.includes("new")) {
       window.location = "/forums";
     } else {
       const { message } = result;
-      error.style.display = "block";
-      error.innerHTML = `<p>${message}</p>`;
-      setTimeout(() => {
-        error.style.display = "none";
-      }, 3000);
+      error(message, "bottom", 3000, "left");
     }
   });
 }

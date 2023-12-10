@@ -681,14 +681,14 @@ class RenderEngines {
 
   addDefaultCSStToContent(content) {
     // Create a regular expression to find the </head> tag in a case-insensitive manner
-    const headTagRegex = /<\/head>/i;
-    const scripts = ["/server/default.css"];
+    const headTagRegex = /<head>/i;
+    const scripts = ["/server/defaults.css"];
     const scriptTags = scripts.map((script) => {
       return `<link rel="stylesheet" href="${script}">  `;
     });
 
     // Use the regular expression to replace the </head> tag with the <link> tag followed by </head>;
-    return content.replace(headTagRegex, `${scriptTags.join("\n")}\n</head>`);
+    return content.replace(headTagRegex, `<head>\n${scriptTags.join("\n")}`);
   }
 
   isFaviconinContent(content) {

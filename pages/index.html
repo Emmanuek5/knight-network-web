@@ -83,12 +83,18 @@
     border: none;
   }
 </style>
-
+<script>
+  function copys(text) {
+    if (copy("play.knight-network.xyz")) {
+      message("copied to clipboard", "top");
+    }
+  }
+</script>
 <div class="page_top">
   <img src="/assets/logo.png" alt="logo" />
   <h1>Knight Network</h1>
   <p>play.knight-network.xyz</p>
-  <button>Copy Ip</button>
+  <button onclick="copys(`play.knight-network.xyz`)">Copy Ip</button>
 </div>
 
 <div class="page_middle">
