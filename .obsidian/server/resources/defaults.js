@@ -240,6 +240,15 @@ function message(
   }, animationDelay);
 }
 
+/**
+ * Sends a notification with the given title, content, image, and optional delay.
+ *
+ * @param {string} title - The title of the notification.
+ * @param {string} content - The content of the notification.
+ * @param {string} image - The image URL for the notification.
+ * @param {number} [delay=1000] - The delay in milliseconds before showing the notification.
+ * @return {boolean} Returns true if the notification is sent successfully, false otherwise.
+ */
 function notify(title, content, image, delay = 1000) {
   Notification.requestPermission((perm) => {
     if (perm == "granted") {
