@@ -90,25 +90,6 @@ if (fs.existsSync(tablesPath) && fs.lstatSync(tablesPath).isDirectory()) {
   });
 }
 
-if (fs.existsSync(routesPath) && fs.lstatSync(routesPath).isDirectory()) {
-  fs.readdirSync(routesPath).forEach((file) => {
-    if (file.endsWith(".js")) {
-      const router = require(path.join(routesPath, file));
-      if (router instanceof Router) {
-        let basePath = router.basePath;
-        if (!basePath.startsWith("/")) {
-          basePath = `/${basePath}`;
-        }
-        app.use("/api" + basePath, path.join(routesPath, file));
-      } else {
-        throw new Error("The router file must export a Router instance");
-      }
-    }
-  });
-} else {
-  console.log("No api folder found");
-}
-
 if (fs.existsSync(pagesPath) && fs.lstatSync(pagesPath).isDirectory()) {
   fs.readdirSync(pagesPath).forEach((folder) => {
     const folderPath = path.join(pagesPath, folder);
@@ -173,7 +154,47 @@ app.get("/favicon.ico", (req, res) => {
   }
 });
 
-app.use("/assets", path.join(process.cwd(), "/assets"));
+const asset_dirs = config.get("asset_dirs");
+
+if (asset_dirs) {
+  for (const asset_dir of asset_dirs) {
+    let dir = path.join(process.cwd(), asset_dir.path) || "";
+    let httpPath = asset_dir.url || "";
+    if (!fs.existsSync(dir) || !fs.lstatSync(dir).isDirectory()) {
+      throw new Error("Directory does not exist: " + dir);
+    }
+    app.dir(dir, httpPath);
+  }
+}
+
+const workers = config.get("workers");
+
+if (workers) {
+  for (const worker of workers) {
+    let routesPath = path.join(process.cwd(), worker.path) || "";
+    let baseUrl = worker.baseurl || "";
+    if (!fs.existsSync(routesPath) || !fs.lstatSync(routesPath).isDirectory()) {
+      throw new Error("Directory does not exist: " + routesPath);
+    }
+    if (worker.enabled) {
+      fs.readdirSync(routesPath).forEach((file) => {
+        if (file.endsWith(".js")) {
+          const router = require(path.join(routesPath, file));
+          if (router instanceof Router) {
+            let basePath = router.basePath;
+            if (!basePath.startsWith("/")) {
+              basePath = `/${basePath}`;
+            }
+            app.use(baseUrl + basePath, path.join(routesPath, file));
+          } else {
+            throw new Error("The router file must export a Router instance");
+          }
+        }
+      });
+    }
+  }
+}
+
 app.use("/public", path.join(process.cwd(), "/public"));
 app.use("/scripts", path.join(process.cwd(), "/public/js"));
 app.use("/styles", path.join(process.cwd(), "/public/css"));

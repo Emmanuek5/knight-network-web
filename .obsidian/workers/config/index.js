@@ -63,18 +63,19 @@ class Config {
       db_port: 6379,
       github_webhook_secret: this.md5(this.rand()),
       auto_update: true,
-      workers: {
-        api: {
-          port:
-            this.config && this.config.workers && this.config.workers.api
-              ? this.config.workers.api.port || defaultPort
-              : defaultPort,
-          path: "/api",
-          enabled: true,
-          restricted: false,
-          secret: crypto.randomBytes(64).toString("hex"), // Include this line in the JSDoc
+      asset_dirs: [
+        {
+          path: "/assets",
+          url: "/assets",
         },
-      },
+      ],
+      workers: [
+        {
+          path: "/api",
+          baseurl: "/api",
+          enabled: true,
+        },
+      ],
       electron: {
         version: "27.0.4",
         enabled: true,
@@ -112,13 +113,6 @@ class Config {
         config.workers = this.getDefaultConfig().workers;
       }
 
-      if (config.workers.api.restricted && !config.workers.api.secret) {
-        config.workers.api.secret = crypto.randomBytes(64).toString("hex");
-        console.log(
-          "No secret key found in config file. Generating a new one."
-        );
-        console.log("Secret key: " + config.workers.api.secret);
-      }
       this.config = config;
     }
   }
