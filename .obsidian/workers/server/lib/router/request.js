@@ -131,7 +131,9 @@ class Request {
   }
 
   toJSON() {
-    return this.body;
+    try {
+      this.body = JSON.parse(this.body);
+    } catch (error) {}
   }
 }
 
