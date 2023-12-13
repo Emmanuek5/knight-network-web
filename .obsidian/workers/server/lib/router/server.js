@@ -140,7 +140,7 @@ class Server extends event.EventEmitter {
       const contentType = request.headers["content-type"];
       if (contentType && contentType.includes("application/json")) {
         // Parse JSON body
-        request.getBodyAsJSON();
+        request.toJSON();
         resolve();
       } else if (contentType && contentType.includes("multipart/form-data")) {
         // Parse multipart/form-data
