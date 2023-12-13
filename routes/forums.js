@@ -63,6 +63,8 @@ router.get("/list/:page/:by", async (req, res) => {
         post.username = user.username;
         post.userimageurl = user.image;
       }
+      post.likedBy = null;
+      post.dislikedBy = null;
     }
 
     res.status(200).json(forumPosts);
@@ -75,6 +77,14 @@ router.get("/list/:page/:by", async (req, res) => {
 router.get("/:id", (req, res) => {
   const forumPost = forumsModel.findOne({ id: req.params.id });
   if (forumPost) {
+    let userid = forumPost.userid;
+    let user = usersModel.findOne({ id: userid }); // Use await for asynchronous operation
+    if (user) {
+      forumPost.username = user.username;
+      forumPost.userimageurl = user.image;
+    }
+    forumPost.likedBy = null;
+    forumPost.dislikedBy = null;
     res.status(200).json(forumPost);
   } else {
     res.status(404).json({ error: true, message: "Forum post not found" });

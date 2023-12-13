@@ -146,7 +146,7 @@ function copy(text = null) {
  */
 function error(
   message,
-  position = "bottom",
+  position = "top",
   animationDelay = 3000,
   side = "left"
 ) {

@@ -167,133 +167,86 @@
   const dislikeCount = document.querySelector(".top p:nth-child(5)");
   let hasLiked = false;
   let hasDisliked = false;
+  async function fetchData() {
+    try {
+      const response = await fetch(route + id);
+      const data = await response.json();
 
-  fetch(route + id)
-    .then((response) => response.json())
-    .then((data) => {
       if (data.error) {
-        error.style.display = "block";
-        error.innerHTML = `<p>Error Getting Forum posts from the server</p>`;
-        setTimeout(() => {
-          error.style.display = "none";
-        }, 3000);
+        displayError("Error Getting Forum posts from the server");
+        return;
       }
-      // Update HTML with data
 
-      const postContent = document.querySelector(".forum_post_content p");
-      // Set values based on data from the API
-      userImage.src = data.userimageurl || ""; // Provide default/fallback value
+      userImage.src = data.userimageurl || "";
+      console.log(data, userImage);
       title.textContent = data.title || "";
       document.getElementById("likeCount").textContent = data.likes || 0;
       document.getElementById("dislikeCount").textContent = data.dislikes || 0;
-
       username.innerHTML = `<a href="/user/${data.userid}">${data.username}</a>`;
-      postDate.textContent = formatDate(data.date) || ""; // Assuming you have formatDate function
-      postContent.textContent = data.content || "";
+      postDate.textContent = formatDate(data.date) || "";
 
-      //fetch has liked status
-      fetch(route + "hasliked/" + id)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.liked) {
-            likeButton.classList.add("liked");
-            hasLiked = true;
-          } else {
-            likeButton.classList.remove("liked");
-            hasLiked = false;
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching has liked status:", error);
-        });
+      const hasLikedResponse = await fetch(route + "hasliked/" + id);
+      const hasLikedData = await hasLikedResponse.json();
+      updateLikedStatus(hasLikedData.liked);
 
-      fetch(route + "hasdisliked/" + id)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.disliked) {
-            dislikeButton.classList.add("disliked");
-            hasDisliked = true;
-          } else {
-            dislikeButton.classList.remove("disliked");
-            hasDisliked = false;
-          }
-        });
-    });
+      const hasDislikedResponse = await fetch(route + "hasdisliked/" + id);
+      const hasDislikedData = await hasDislikedResponse.json();
+      updateDislikedStatus(hasDislikedData.disliked);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      displayError("Error fetching data from the server");
+    }
+  }
 
-  function updateCounts() {
-    // Fetch post data for updated counts
-    fetch(route + id)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          modal(
-            "",
-            "Error",
-            "There was an error updating counts from the server" + data.error
-          );
-        } else {
-          console.log(data);
-          document.getElementById("likeCount").textContent = data.likes || 0;
-          document.getElementById("dislikeCount").textContent =
-            data.dislikes || 0;
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching update counts:", error);
-      })
-      .then(() => {
-        fetch(route + "hasliked/" + id);
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.liked) {
-          likeButton.classList.add("liked");
-          hasLiked = true;
-        } else {
-          likeButton.classList.remove("liked");
-          hasLiked = false;
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching has liked status:", error);
-      })
-      .then(() => {
-        // Fetch has disliked status
-        fetch(route + "hasdisliked/" + id);
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.disliked) {
-          dislikeButton.classList.add("disliked"); // Use a different class if needed
-          hasDisliked = true;
-        } else {
-          dislikeButton.classList.remove("disliked"); // Use a different class if needed
-          hasDisliked = false;
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching has disliked status:", error);
-      });
+  function updateLikedStatus(liked) {
+    if (liked) {
+      likeButton.classList.add("liked");
+      hasLiked = true;
+    } else {
+      likeButton.classList.remove("liked");
+      hasLiked = false;
+    }
+  }
+
+  function updateDislikedStatus(disliked) {
+    if (disliked) {
+      dislikeButton.classList.add("disliked");
+      hasDisliked = true;
+    } else {
+      dislikeButton.classList.remove("disliked");
+      hasDisliked = false;
+    }
+  }
+
+  async function updateCounts() {
+    try {
+      const response = await fetch(route + id);
+      const data = await response.json();
+
+      if (data.error) {
+        displayError("Error updating counts from the server");
+        return;
+      }
+
+      document.getElementById("likeCount").textContent = data.likes || 0;
+      document.getElementById("dislikeCount").textContent = data.dislikes || 0;
+
+      const hasLikedResponse = await fetch(route + "hasliked/" + id);
+      const hasLikedData = await hasLikedResponse.json();
+      updateLikedStatus(hasLikedData.liked);
+
+      const hasDislikedResponse = await fetch(route + "hasdisliked/" + id);
+      const hasDislikedData = await hasDislikedResponse.json();
+      updateDislikedStatus(hasDislikedData.disliked);
+    } catch (error) {
+      console.error("Error updating counts:", error);
+      displayError("Error updating counts from the server");
+    }
   }
 
   function like() {
     if (!hasLiked) {
-      fetch(route + "like/" + id, {
-        method: "POST",
-      })
-        .then((res) => {
-          if (res.ok) {
-            updateCounts();
-            likeButton.classList.add("liked"); // Apply liked style
-          } else {
-            modal(
-              "",
-              "You already liked this post",
-              "You can only like a post once"
-            );
-          }
-        })
-        .catch((error) => {});
+      fetchAction(route + "like/" + id);
     } else {
       updateCounts();
     }
@@ -301,24 +254,45 @@
 
   function dislike() {
     if (!hasDisliked) {
-      fetch(route + "dislike/" + id, {
-        method: "POST",
-      }).then((res) => {
-        if (res.ok) {
-          updateCounts();
-          dislikeButton.classList.add("disliked"); // Apply disliked style
-        } else {
-          modal(
-            "",
-            "You already disliked this post",
-            "You can only dislike a post once"
-          );
-        }
-      });
+      fetchAction(route + "dislike/" + id);
     } else {
       updateCounts();
     }
   }
+
+  function fetchAction(actionRoute) {
+    fetch(actionRoute, {
+      method: "POST",
+    })
+      .then((res) => {
+        if (res.ok) {
+          updateCounts();
+          if (actionRoute.includes("like")) {
+            likeButton.classList.add("liked");
+          } else if (actionRoute.includes("dislike")) {
+            dislikeButton.classList.add("disliked");
+          }
+        } else {
+          modal(
+            "",
+            `You already ${
+              actionRoute.includes("like") ? "liked" : "disliked"
+            } this post`,
+            `You can only ${
+              actionRoute.includes("like") ? "like" : "dislike"
+            } a post once`
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error performing action:", error);
+      });
+  }
+
+  function displayError(message) {
+    error(message);
+  }
+
   function formatDate(date) {
     const options = {
       year: "numeric",
@@ -327,4 +301,6 @@
     };
     return new Date(date).toLocaleDateString("en-US", options);
   }
+
+  fetchData();
 </script>
