@@ -768,17 +768,21 @@ class Table extends EventEmitter {
    */
   findAndUpdate(query, update) {
     const results = this.find(query);
+
     if (results.length > 0) {
-      for (const row of results) {
-        for (const key in update) {
-          row[key] = update[key];
+      //locate the data in the main array and update it
+      for (let data of this.data) {
+        if (data.id === results[0].id) {
+          for (const key in update) {
+            data[key] = update[key];
+          }
         }
       }
+      this.emit("save");
       return true;
     } else {
       return false;
     }
-    // Emit the 'save' event after updating a row
   }
 
   /**
@@ -791,9 +795,13 @@ class Table extends EventEmitter {
   findOneAndUpdate(query, update) {
     const results = this.find(query);
     if (results.length > 0) {
-      const updatedRow = results[0];
-      for (const key in update) {
-        updatedRow[key] = update[key];
+      //locate the data in the main array and update it
+      for (let data of this.data) {
+        if (data.id === results[0].id) {
+          for (const key in update) {
+            data[key] = update[key];
+          }
+        }
       }
       this.emit("save");
       return true;

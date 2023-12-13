@@ -81,60 +81,87 @@ router.get("/:id", (req, res) => {
   }
 });
 
-router.post("/like/:id", (req, res) => {
+router.post("/like/:id", async (req, res) => {
   const { id } = req.params;
   const user = req.session.user;
-  const data = forumsModel.findOne({ id });
-  const userData = usersModel.findOne({ id: user.id });
+
   if (!user) {
     res.status(403).json({ error: true, message: "You must be logged in" });
     return;
   }
 
+  const data = await forumsModel.findOne({ id });
+  const userData = await usersModel.findOne({ id: user.id });
+
   if (userData.likedPosts.includes(id)) {
-    res.status(400).json({ error: true, message: "Post already liked" });
+    res.status(400).json({
+      error: true,
+      message: "You have already liked this post",
+    });
     return;
   }
 
+  if (userData.dislikedPosts.includes(id)) {
+    // If already disliked, remove the dislike
+    forumsModel.findOneAndUpdate({ id }, { dislikes: data.dislikes - 1 });
+    userData.dislikedPosts = userData.dislikedPosts.filter(
+      (postId) => postId !== id
+    );
+    data.dislikedBy = data.dislikedBy.filter((userId) => userId !== user.id);
+    forumsModel.findOneAndUpdate({ id }, { dislikedBy: data.dislikedBy });
+    usersModel.findOneAndUpdate(
+      { id: user.id },
+      { dislikedPosts: userData.dislikedPosts }
+    );
+  }
   forumsModel.findOneAndUpdate({ id }, { likes: data.likes + 1 });
   data.likedBy.push(user.id);
   userData.likedPosts.push(id);
-  usersModel.findOneAndUpdate(
-    { id: user.id },
-    { likedPosts: userData.likedPosts }
-  );
-
   forumsModel.findOneAndUpdate({ id }, { likedBy: data.likedBy });
+
   res.status(200).json({
     message: "Forum post liked successfully",
     success: true,
   });
 });
 
-router.post("/dislike/:id", (req, res) => {
+router.post("/dislike/:id", async (req, res) => {
   const { id } = req.params;
   const user = req.session.user;
-  const data = forumsModel.findOne({ id });
-  const userData = usersModel.findOne({ id: user.id });
 
   if (!user) {
     res.status(403).json({ error: true, message: "You must be logged in" });
     return;
   }
+
+  const data = await forumsModel.findOne({ id });
+  const userData = await usersModel.findOne({ id: user.id });
+
   if (userData.dislikedPosts.includes(id)) {
-    res.status(400).json({ error: true, message: "Post already disliked" });
+    res.status(400).json({
+      error: true,
+      message: "You have already disliked this post",
+    });
     return;
   }
 
+  if (userData.likedPosts.includes(id)) {
+    // If already liked, remove the like
+    forumsModel.findOneAndUpdate({ id }, { likes: data.likes - 1 });
+    userData.likedPosts = userData.likedPosts.filter((postId) => postId !== id);
+    data.likedBy = data.likedBy.filter((userId) => userId !== user.id);
+    forumsModel.findOneAndUpdate({ id }, { likedBy: data.likedBy });
+    usersModel.findOneAndUpdate(
+      { id: user.id },
+      { likedPosts: userData.likedPosts }
+    );
+  }
+  // If not disliked, add the dislike
   forumsModel.findOneAndUpdate({ id }, { dislikes: data.dislikes + 1 });
   data.dislikedBy.push(user.id);
   userData.dislikedPosts.push(id);
-  usersModel.findOneAndUpdate(
-    { id: user.id },
-    { dislikedPosts: userData.dislikedPosts }
-  );
-
   forumsModel.findOneAndUpdate({ id }, { dislikedBy: data.dislikedBy });
+
   res.status(200).json({
     message: "Forum post disliked successfully",
     success: true,
@@ -144,13 +171,13 @@ router.post("/dislike/:id", (req, res) => {
 router.get("/hasliked/:id", (req, res) => {
   const { id } = req.params;
   const user = req.session.user;
-  const data = forumsModel.findOne({ id });
-  const userData = usersModel.findOne({ id: user.id });
-
   if (!user) {
     res.status(403).json({ error: true, message: "You must be logged in" });
     return;
   }
+  const data = forumsModel.findOne({ id });
+  const userData = usersModel.findOne({ id: user.id });
+
   if (userData.likedPosts.includes(id)) {
     res.status(200).json({ liked: true });
   } else {

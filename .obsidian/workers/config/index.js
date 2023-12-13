@@ -53,6 +53,11 @@ class Config {
       name: "An Obsidian App",
       mode: "dev",
       port: 3000,
+      rate_limits: {
+        enabled: true,
+        duration: 60,
+        max: 100,
+      },
       no_imports: false,
       view_engine: "html",
       db_port: 6379,

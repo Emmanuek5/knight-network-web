@@ -191,13 +191,20 @@
       postDate.textContent = formatDate(data.date) || ""; // Assuming you have formatDate function
       postContent.textContent = data.content || "";
 
+      //fetch has liked status
       fetch(route + "hasliked/" + id)
         .then((response) => response.json())
         .then((data) => {
           if (data.liked) {
             likeButton.classList.add("liked");
             hasLiked = true;
+          } else {
+            likeButton.classList.remove("liked");
+            hasLiked = false;
           }
+        })
+        .catch((error) => {
+          console.error("Error fetching has liked status:", error);
         });
 
       fetch(route + "hasdisliked/" + id)
@@ -206,12 +213,15 @@
           if (data.disliked) {
             dislikeButton.classList.add("disliked");
             hasDisliked = true;
+          } else {
+            dislikeButton.classList.remove("disliked");
+            hasDisliked = false;
           }
         });
     });
 
   function updateCounts() {
-    // Refetch the post to get updated counts
+    // Fetch post data for updated counts
     fetch(route + id)
       .then((response) => response.json())
       .then((data) => {
@@ -222,6 +232,7 @@
             "There was an error updating counts from the server" + data.error
           );
         } else {
+          console.log(data);
           document.getElementById("likeCount").textContent = data.likes || 0;
           document.getElementById("dislikeCount").textContent =
             data.dislikes || 0;
@@ -229,6 +240,39 @@
       })
       .catch((error) => {
         console.error("Error fetching update counts:", error);
+      })
+      .then(() => {
+        fetch(route + "hasliked/" + id);
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.liked) {
+          likeButton.classList.add("liked");
+          hasLiked = true;
+        } else {
+          likeButton.classList.remove("liked");
+          hasLiked = false;
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching has liked status:", error);
+      })
+      .then(() => {
+        // Fetch has disliked status
+        fetch(route + "hasdisliked/" + id);
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.disliked) {
+          dislikeButton.classList.add("disliked"); // Use a different class if needed
+          hasDisliked = true;
+        } else {
+          dislikeButton.classList.remove("disliked"); // Use a different class if needed
+          hasDisliked = false;
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching has disliked status:", error);
       });
   }
 
@@ -250,6 +294,8 @@
           }
         })
         .catch((error) => {});
+    } else {
+      updateCounts();
     }
   }
 
@@ -269,6 +315,8 @@
           );
         }
       });
+    } else {
+      updateCounts();
     }
   }
   function formatDate(date) {

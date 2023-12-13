@@ -21,7 +21,7 @@ class Server extends event.EventEmitter {
     this.viewEngine = viewEngine;
 
     if (!fs.existsSync(COOKIES_DIR)) {
-      fs.mkdirSync(COOKIES_DIR);
+      fs.mkdirSync(COOKIES_DIR, { recursive: true });
     }
   }
 
@@ -31,6 +31,14 @@ class Server extends event.EventEmitter {
 
     response.viewEngine = this.viewEngine;
     response.req_headers = request.headers;
+
+    if (
+      req.headers["content-type"] &&
+      req.headers["content-type"].includes("multipart/form-data")
+    ) {
+    } else {
+      request.chunkBody();
+    }
 
     // Record the start time when the request is received
     const startTime = new Date();

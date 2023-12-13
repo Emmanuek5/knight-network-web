@@ -10,7 +10,7 @@ const pagesPath = path.join(defaultPath, "pages");
 const routesPath = path.join(defaultPath, "routes");
 const tablesPath = path.join(defaultPath, "models");
 const { spawn } = require("child_process");
-
+const requestCount = new Map();
 let portdb = null;
 let url = null;
 let remote = false;
@@ -29,6 +29,40 @@ if (!config.get("db_url") === undefined && config.get("db_url") !== "") {
 } else {
   url = "database";
 }
+
+const rate_config = config.get("rate_limits");
+
+if (rate_config.enabled) {
+  if (!rate_config.duration) {
+    rate_config.duration = 60;
+  }
+  if (!rate_config.max) {
+    rate_config.max = 100;
+  }
+}
+
+app.server.on("request", (req, res) => {
+  const ipAddress = req.ip;
+
+  // Initialize request count for the IP address
+  if (!requestCount.has(ipAddress)) {
+    requestCount.set(ipAddress, 1);
+
+    // Set a timer to reset the count after the duration
+    setTimeout(() => {
+      requestCount.delete(ipAddress);
+    }, rate_config.duration * 1000);
+  } else {
+    // Increment the request count
+    requestCount.set(ipAddress, requestCount.get(ipAddress) + 1);
+    // Check if the request count exceeds the maximum allowed
+    if (requestCount.get(ipAddress) > rate_config.max) {
+      res.setHeader("Retry-After", rate_config.duration);
+      res.status(429).send("Too many requests");
+      return;
+    }
+  }
+});
 
 if (config.get("auto_update") === true) {
   const { Github } = require("../workers/github");

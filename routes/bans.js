@@ -26,18 +26,11 @@ router.post("/create", (req, res) => {
       isPermanent: isPermanentBoolean,
     });
 
-    console.log(newBan);
-
     if (!newBan) {
       res.status(400).send(newBan[1]);
       return;
     }
 
-    newBan.save((err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
     const json = {
       id,
       message: "Ban created successfully",

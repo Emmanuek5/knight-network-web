@@ -8,6 +8,7 @@ class Response {
     this.response = httpResponse;
     this.req_headers = {};
     this.statusCode = 200; // Default status code is 200 OK
+    this.limi;
     this.headers = {
       "Content-Type": "text/html",
       Engine: "Obsidian Engine",
@@ -101,11 +102,10 @@ class Response {
     return this;
   }
 
-  async file(filePath) {
+  file(filePath) {
     if (fs.existsSync(filePath)) {
       this.body = fs.readFileSync(filePath);
       this.compress();
-
       this.setHeader("Content-Type", "application/octet-stream");
       this.response.writeHead(this.statusCode, this.headers);
       this.response.end(this.body);
@@ -150,6 +150,7 @@ class Response {
 
   end() {
     this.response.end();
+
     return this;
   }
 }

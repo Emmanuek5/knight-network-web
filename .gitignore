@@ -9,4 +9,5 @@ cache
 **/electron/pages
 **/electron/electron-**
 out
+test
 ```

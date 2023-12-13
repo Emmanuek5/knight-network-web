@@ -17,11 +17,4 @@ router.get("/logout", (req, res) => {
   console.log(req.session);
 });
 
-router.post("/upload", (req, res) => {
-  console.log(req);
-  const { filename, content } = req.body;
-  fs.writeFileSync(path.join(__dirname, filename), content);
-  res.status(200).json({ message: "File uploaded successfully" });
-});
-
 module.exports = router;
