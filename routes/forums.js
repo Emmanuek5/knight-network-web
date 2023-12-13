@@ -248,4 +248,6 @@ try {
   }
 
   module.exports = router;
-} catch (error) {}
+} catch (error) {
+  console.log(error);
+}
