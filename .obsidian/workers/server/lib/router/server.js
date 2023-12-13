@@ -186,16 +186,17 @@ class Server extends event.EventEmitter {
       // Calculate the time taken to process the request in milliseconds
       const endTime = new Date();
       const elapsedTime = endTime - startTime;
-      // Log the request with method, path, status code, and milliseconds
+      const ip = request.ip;
       console.log(
-        `${request.method} ${request.path} ${response.statusCode} ${elapsedTime}ms`
+        ` ${ip} -> ${request.method} -> ${request.path} -> ${response.statusCode}  ${elapsedTime}ms`
       );
     } else {
       const endTime = new Date();
       const elapsedTime = endTime - startTime;
+
       response.setStatus(404).send("Not Found");
       console.log(
-        `${request.method} ${request.path} ${response.statusCode} ${elapsedTime}ms`
+        ` ${ip} -> ${request.method} -> ${request.path} -> ${response.statusCode}  ${elapsedTime}ms`
       );
     }
   }
