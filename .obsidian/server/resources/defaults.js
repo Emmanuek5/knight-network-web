@@ -240,7 +240,7 @@ function message(
   }, animationDelay);
 }
 
-function notify(title, body, image, options = {}, type = "normal") {
+function notify(title, body, image, options, onClick) {
   // Check if the browser supports notifications
   if (!("Notification" in window)) {
     console.error("This browser does not support desktop notifications");
@@ -249,39 +249,25 @@ function notify(title, body, image, options = {}, type = "normal") {
 
   // Check if the user has granted permission to show notifications
   if (Notification.permission === "granted") {
-    let notification;
-
-    if (type === "normal") {
-      // Create a notification with an image
-      notification = new Notification(title, {
-        body: body,
-        icon: image,
-        ...options,
-      });
-    } else if (type === "text") {
-      // Create a text-only notification
-      notification = new Notification(title, {
-        body: body,
-        ...options,
-      });
-    } else {
-      console.error(
-        'Invalid notification type. Supported types: "normal", "text"'
-      );
-      return;
-    }
+    // Create a notification
+    const notification = new Notification(title, {
+      body: body,
+      icon: image,
+      ...options,
+    });
 
     // Optional: Add click event listener to handle notification click
     notification.addEventListener("click", () => {
-      // Handle click event
-      console.log("Notification clicked!");
+      if (onClick) {
+        onClick();
+      }
     });
   } else if (Notification.permission !== "denied") {
     // Request permission from the user
     Notification.requestPermission().then((permission) => {
       if (permission === "granted") {
         // Call the notify function again after getting permission
-        notify(type, title, body, image, options);
+        notify(title, body, image, options);
       }
     });
   }
