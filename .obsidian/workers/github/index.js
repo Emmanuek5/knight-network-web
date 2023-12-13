@@ -79,6 +79,8 @@ class Github {
     const branch = payload.ref.split("/").pop();
     const commit = payload.after;
 
+    console.log(commit);
+
     // Check if the pushed commit is different from the current commit
     const currentBranch = execSync("git rev-parse --abbrev-ref HEAD")
       .toString()
