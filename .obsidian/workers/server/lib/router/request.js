@@ -131,7 +131,11 @@ class Request {
   }
 
   getBodyAsJSON() {
-    return JSON.parse(this.body);
+    try {
+      return JSON.parse(this.body);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
 
