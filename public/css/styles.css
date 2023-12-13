@@ -180,6 +180,73 @@
     color: #000;
 }
 
+.forum-container .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.forum-container .bar a {
+    text-decoration: none;
+}
+
+.forum-container .bar button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 5%;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.forum-container .bar button:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.forum-container .bar select {
+    padding: 8px;
+    border-radius: 5%;
+    border: 1px solid #ddd;
+    margin-left: 10px;
+}
+
+.forum-container .bottom_bar {
+    display: flex;
+    flex-direction: column;
+    /* Align items in a column */
+    align-items: center;
+    margin-top: 20px;
+}
+
+.forum-container .bottom_bar p {
+    margin-bottom: 5px;
+    /* Add some spacing below the "Pages" paragraph */
+}
+
+.forum-container .bottom_bar .pagination-wheel {
+    display: flex;
+    justify-content: center;
+    /* Center the pagination wheel */
+}
+
+.forum-container .bottom_bar .pagination-wheel button {
+    background-color: #ddd;
+    color: #333;
+    border: none;
+    padding: 5px;
+    margin: 0 2px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.forum-container .bottom_bar .pagination-wheel button:hover {
+    background-color: #333;
+    color: #fff;
+}
+
  .forum-post-form {
      max-width: 600px;
      margin: 20px auto;

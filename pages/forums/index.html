@@ -1,12 +1,27 @@
 <div class="forum-container">
   <h1>Forum Posts</h1>
-  <a href="forums/new"><button>New Post +</button></a>
+  <div class="bar">
+    <a href="forums/new"><button>New Post +</button></a>
+    <select name="sort_by" id="">
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
+      <option value="most_liked">Most Liked</option>
+      <option value="least_liked">Least Liked</option>
+      <option value="most_disliked">Most Disliked</option>
+      <option value="least_disliked">Least Disliked</option>
+    </select>
+  </div>
   <p>
     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis
     aspernatur necessitatibus provident laborum quae accusamus facere ab. Minima
     voluptates voluptatum fuga expedita nemo? Voluptatem voluptas vel quibusdam
     adipisci optio modi?
   </p>
+  <div class="forum-posts"></div>
+  <div class="bottom_bar">
+    <p>Pages</p>
+    <div class="pagination-wheel"></div>
+  </div>
 </div>
 
 <script src="/scripts/forums.js"></script>

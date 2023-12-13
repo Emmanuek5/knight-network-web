@@ -36,11 +36,11 @@ router.post("/new", (req, res) => {
   }
 });
 
-router.get("/list/:page/:by", async (req, res) => {
+router.get("/list/:page/:by/:order", async (req, res) => {
   try {
     const forumPosts = forumsModel.find({});
 
-    const { page, by } = req.params;
+    const { page, by, order } = req.params;
     let pageInt = parseInt(page);
     let limit = 20;
 
@@ -48,12 +48,18 @@ router.get("/list/:page/:by", async (req, res) => {
       forumPosts.sort((a, b) => b.likes - a.likes);
     } else if (by === "date") {
       forumPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    } else if (by === "dislikes") {
+      forumPosts.sort((a, b) => b.dislikes - a.dislikes);
     } else {
       forumPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
     }
 
     if (pageInt > 0) {
       forumPosts.slice((pageInt - 1) * limit, pageInt * limit);
+    }
+
+    if (order === "desc") {
+      forumPosts.reverse();
     }
 
     for (const post of forumPosts) {
@@ -68,6 +74,21 @@ router.get("/list/:page/:by", async (req, res) => {
     }
 
     res.status(200).json(forumPosts);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+router.get("/pagenumber", async (req, res) => {
+  try {
+    const forumPosts = forumsModel.find({});
+    let limit = 20;
+    let pageNumber = Math.ceil(forumPosts.length / limit);
+    res.status(200).json({
+      success: true,
+      pageNumber: pageNumber,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Internal Server Error");
