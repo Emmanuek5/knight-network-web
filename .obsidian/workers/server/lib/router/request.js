@@ -35,7 +35,7 @@ class Request {
     const contentType = this.headers["content-type"];
 
     if (contentType && contentType.includes("application/json")) {
-      this.body = this.getBodyAsJSON();
+      this.body = this.toJSON();
     } else if (
       contentType &&
       contentType.includes("application/x-www-form-urlencoded")
@@ -130,11 +130,21 @@ class Request {
     return files;
   }
 
-  getBodyAsJSON() {
+  toJSON() {
     try {
-      return JSON.parse(this.body);
+      // Check if body is already a JSON object
+      if (typeof this.body === "object" && !Array.isArray(this.body)) {
+        // If it's already an object, no need to parse
+        return this.body;
+      } else {
+        // If it's not an object, try to parse it
+        const parsedBody = JSON.parse(this.body);
+        return parsedBody;
+      }
     } catch (error) {
       console.log(error);
+      // Return an empty object or handle the error as needed
+      return {};
     }
   }
 }
