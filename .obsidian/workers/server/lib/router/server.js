@@ -192,7 +192,7 @@ class Server extends event.EventEmitter {
         .map((segment, index) => (index === 0 || index >= 3 ? segment : "xxx"))
         .join(".");
       console.log(
-        ` ${ip} -> ${request.method} -> ${request.path} -> ${response.statusCode}  ${elapsedTime}ms`
+        ` ${ip} ${request.method} ${request.path} ${response.statusCode}  ${elapsedTime}ms`
       );
     } else {
       const endTime = new Date();
@@ -205,7 +205,7 @@ class Server extends event.EventEmitter {
 
       response.setStatus(404).send("Not Found");
       console.log(
-        ` ${ip} -> ${request.method} -> ${request.path} -> ${response.statusCode}  ${elapsedTime}ms`
+        ` ${ip}  ${request.method}  ${request.path}  ${response.statusCode}  ${elapsedTime}ms`
       );
     }
   }
