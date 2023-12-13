@@ -133,9 +133,7 @@ class Request {
   toJSON() {
     try {
       return JSON.parse(this.body);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }
 }
 
