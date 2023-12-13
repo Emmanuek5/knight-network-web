@@ -14,11 +14,8 @@ logger("Starting Build Engine " + new Date().getTime());
 let start = new Date().getTime();
 const builder = new Build();
 builder.buildAllPages();
-builder.buildALLStyles();
-builder.buildAllScripts();
 builder.buildAllAssets();
 builder.buildAllPublic();
-builder.setUpNewServer();
+
 let end = new Date().getTime();
 logger("Build Completed in " + (end - start) + "ms");
-

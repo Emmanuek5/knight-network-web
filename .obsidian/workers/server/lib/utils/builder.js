@@ -9,7 +9,7 @@ class Build {
     this.scriptsDir = process.cwd() + "/public/js"; // Set your scripts directory
     this.stylesDir = process.cwd() + "/public/css"; // Set your styles directory
     this.assetsDir = process.cwd() + "/assets"; // Set your assets directory
-    this.pagesdistDir = process.cwd() + "/dist/views/"; // Set your destination (dist) directory
+    this.pagesdistDir = process.cwd() + "/dist/"; // Set your destination (dist) directory
     this.publicDir = process.cwd() + "/public";
 
     this.renderEngines = new RenderEngines();
@@ -35,16 +35,11 @@ class Build {
       const stats = fs.statSync(sourceItemPath);
 
       if (stats.isDirectory()) {
-        // If it's a directory, create the corresponding directory in dist
-        if (!fs.existsSync(distItemPath)) {
-          fs.mkdirSync(distItemPath, { recursive: true });
-        }
         // Recursively build pages in subdirectories with the correct dist folder
         this.buildPages(sourceItemPath, distItemPath);
       } else if (stats.isFile() && path.extname(item) === ".html") {
         // If it's an HTML file, change the file extension to ".ejs"
-        const newDistItemPath = distItemPath.replace(".html", ".ejs");
-
+        const newDistItemPath = distItemPath;
         // Create a folder structure in the dist directory based on the source folder
         const relativePath = path.relative(this.sourceDir, sourceItemPath);
         const folderPath = path.dirname(relativePath);
@@ -86,21 +81,13 @@ class Build {
     fs.writeFileSync(distFilePath, content);
   }
 
-  buildAllScripts() {
-    // Copy all scripts to the dist/scripts directory
-    this.copyFolder(this.scriptsDir, path.join(this.distDir, "scripts"));
-  }
-
-  buildALLStyles() {
-    this.copyFolder(this.stylesDir, path.join(this.distDir, "styles"));
-  }
-
   buildAllAssets() {
     this.copyFolder(this.assetsDir, path.join(this.distDir, "assets"));
   }
 
   buildAllPublic() {
-    this.copyFolder(this.publicDir, path.join(this.distDir, "public"));
+    this.copyFolder(this.scriptsDir, path.join(this.distDir, "scripts"));
+    this.copyFolder(this.stylesDir, path.join(this.distDir, "styles"));
   }
 
   setUpNewServer() {
