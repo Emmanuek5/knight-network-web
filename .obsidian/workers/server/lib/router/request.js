@@ -35,6 +35,7 @@ class Request {
     const contentType = this.headers["content-type"];
 
     if (contentType && contentType.includes("application/json")) {
+      this.body = this.toJSON();
     } else if (
       contentType &&
       contentType.includes("application/x-www-form-urlencoded")
