@@ -1,0 +1,108 @@
+<style>
+  .container {
+    text-align: center;
+    background-color: #3498db;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    max-width: 300px;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    opacity: 0; /* Initially set opacity to 0 */
+    transition: opacity 0.5s ease-in-out; /* Add transition for opacity */
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(169, 169, 169, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0; /* Initially set opacity to 0 */
+    transition: opacity 0.5s ease-in-out; /* Add transition for opacity */
+  }
+
+  .spinner {
+    border: 4px solid rgba(255, 255, 255, 0.7);
+    border-top: 4px solid #fff;
+    animation: spin 1s linear infinite;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .h1 {
+    margin-top: 20px;
+    color: #fff;
+  }
+
+  p {
+    color: #ecf0f1;
+    margin-top: 10px;
+  }
+</style>
+
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+</div>
+
+<div class="container" id="container">
+  <input type="hidden" id="link_id" value="<<$id>>" />
+  <h1 class="h1">Linking your account to your Minecraft account</h1>
+  <p>Please wait while we process your request...</p>
+</div>
+
+<script>
+  if (!authenticated) {
+    window.location.href = "/auth/login";
+  }
+
+  const overlay = document.getElementById("overlay");
+  const container = document.getElementById("container");
+  const link_id = document.getElementById("link_id").value;
+  const h1 = document.querySelector(".h1");
+  const spinner = document.querySelector(".spinner");
+  const p = document.querySelector(".container p");
+  const route = "/api/link/";
+
+  // Show overlay and spinner while waiting for API response
+  overlay.style.opacity = "1"; // Fade in
+  container.style.opacity = "1"; // Fade in
+
+  setTimeout(() => {
+    fetch(route + link_id, {
+      method: "POST",
+    }).then((response) => {
+      overlay.style.opacity = "0"; // Fade out
+
+      response.json().then((data) => {
+        if (data.error) {
+          container.style.backgroundColor = "#e74c3c";
+          h1.textContent = data.message;
+          p.textContent =
+            "There was an error processing your request. Please try again later.";
+        } else {
+          h1.textContent = data.message;
+        }
+      });
+    });
+  }, 2000);
+</script>

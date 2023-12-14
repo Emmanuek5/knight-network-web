@@ -11,6 +11,7 @@ const COOKIES_DIR = path.join(process.cwd(), ".obsidian/cookies");
 const uuid = require("uuid");
 const sessions = [];
 const zlib = require("zlib"); //
+const url = require("url");
 class Server extends event.EventEmitter {
   constructor(viewEngine) {
     super();

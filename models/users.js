@@ -48,6 +48,14 @@ table.setSchema({
     default:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
   },
+  mc_uuid: {
+    type: "string",
+    default: null,
+  },
+  linked: {
+    type: "boolean",
+    default: false,
+  },
 });
 
 module.exports = table;
