@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+process.on("unhandledRejection", (err) => {
+  console.error(err);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error(err);
+});
 
 const { spawn } = require("child_process");
 const chokidar = require("chokidar");
