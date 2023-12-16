@@ -33,6 +33,15 @@ try {
         .status(500)
         .json({ error: true, message: "Error creating forum post" });
     } else {
+      const user1 = usersModel.findOne({ id: userid });
+      if (!user1) {
+        res
+          .status(500)
+          .json({ error: true, message: "Error creating forum post" });
+      }
+      user1.forumPosts.push(forumid);
+      user1.points = user1.points + 10;
+      usersModel.findAndUpdate({ id: userid }, user1);
       res
         .status(200)
         .json({ message: "Forum post created successfully", success: true });
@@ -41,7 +50,7 @@ try {
 
   router.get("/list/:page/:by/:order", async (req, res) => {
     try {
-      const forumPosts = forumsModel.find({});
+      let forumPosts = forumsModel.find({});
 
       const { page, by, order } = req.params;
       let pageInt = parseInt(page);
@@ -58,7 +67,7 @@ try {
       }
 
       if (pageInt > 0) {
-        forumPosts.slice((pageInt - 1) * limit, pageInt * limit);
+        forumPosts = forumPosts.slice((pageInt - 1) * limit, pageInt * limit);
       }
 
       if (order === "desc") {
@@ -83,6 +92,24 @@ try {
     }
   });
 
+  router.delete("/:id", (req, res) => {
+    const user = req.session.user;
+    if (!user) {
+      res.status(403).json({ error: true, message: "You must be logged in" });
+      return;
+    }
+    const forumPost = forumsModel.findOne({
+      id: req.params.id,
+      userid: user.id,
+    });
+    if (forumPost) {
+      forumsModel.delete({ id: req.params.id });
+      res.status(200).json({ message: "Forum post deleted successfully" });
+    } else {
+      res.status(404).json({ error: true, message: "Forum post not found" });
+    }
+  });
+
   router.get("/pagenumber", async (req, res) => {
     try {
       const forumPosts = forumsModel.find({});
@@ -95,6 +122,23 @@ try {
     } catch (error) {
       console.error("Error:", error);
       res.status(500).send("Internal Server Error");
+    }
+  });
+
+  router.put("/:id/edit", (req, res) => {
+    const user = req.session.user;
+    if (!user) {
+      res.status(403).json({ error: true, message: "You must be logged in" });
+      return;
+    }
+    const { id } = req.params;
+    const { title, content } = req.body;
+    const forumPost = forumsModel.findOne({ id, userid: user.id });
+    if (forumPost) {
+      forumsModel.findAndUpdate({ id }, { title, content });
+      res.status(200).json({ message: "Forum post updated successfully" });
+    } else {
+      res.status(404).json({ error: true, message: "Forum post not found" });
     }
   });
 

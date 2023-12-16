@@ -76,6 +76,19 @@ function startNodeProcess() {
         COLORS.RESET
       );
     });
+    nodeProcess.on("uncaughtException", function (error) {
+      console.error(
+        COLORS.RED_TEXT + "[ENGINE ERROR] - " + error.toString().trim(),
+        COLORS.RESET
+      );
+    });
+
+    nodeProcess.on("error", function (error) {
+      console.error(
+        COLORS.RED_TEXT + "[ENGINE ERROR] - " + error.toString().trim(),
+        COLORS.RESET
+      );
+    });
 
     nodeProcess.on("exit", function (code, signal) {
       nodeProcess = null;

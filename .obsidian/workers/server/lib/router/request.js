@@ -77,33 +77,31 @@ class Request {
           reject(err);
         } else {
           this.body = fields;
-          // Format files array
-          this.files = [];
+          // Format files array with field names as keys
+          this.files = {};
 
           Object.keys(files).forEach((fieldName) => {
             const fieldFiles = files[fieldName];
 
-            fieldFiles.forEach((file) => {
-              this.files.push({
-                name: file.originalFilename,
-                temp: file.filepath,
-                type: file.mimetype,
-                size: file.size,
-                mv: (path, callback) => {
-                  // Move file to destination u= without fs.rename
-                  fs.copyFile(file.filepath, path, (err) => {
-                    if (err) {
-                      callback(err);
-                    } else {
-                      callback();
-                    }
-                  });
-                },
-                // Add other properties as needed
-              });
-            });
+            this.files[fieldName] = fieldFiles.map((file) => ({
+              name: file.originalFilename,
+              temp: file.filepath,
+              type: file.mimetype,
+              size: file.size,
+              mv: (path, callback) => {
+                // Move file to destination without fs.rename
+                fs.copyFile(file.filepath, path, (err) => {
+                  if (err) {
+                    callback(err);
+                  } else {
+                    callback();
+                  }
+                });
+              },
+              // Add other properties as needed
+            }));
           });
-
+          this.file = this.files[0];
           resolve();
         }
       });

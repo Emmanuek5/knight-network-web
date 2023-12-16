@@ -12,6 +12,7 @@ const uuid = require("uuid");
 const sessions = [];
 const zlib = require("zlib"); //
 const url = require("url");
+const ObsidianError = require("../../../../classes/ObsidianError");
 class Server extends event.EventEmitter {
   constructor(viewEngine) {
     super();
@@ -377,10 +378,28 @@ class Server extends event.EventEmitter {
       return dynamicRouteHandler;
     }
 
+    // Try to find an open-ended URL handler
+    const openEndedUrlHandler = this.findOpenEndedUrlHandler(path, method);
+    if (openEndedUrlHandler) {
+      return openEndedUrlHandler;
+    }
+
     return null;
   }
 
   // ...
+  findOpenEndedUrlHandler(path, method) {
+    for (const routePath in this.routes) {
+      if (routePath.endsWith("/*") && path.startsWith(routePath.slice(0, -2))) {
+        const routeHandlers = this.routes[routePath];
+        if (routeHandlers && routeHandlers[method]) {
+          return routeHandlers[method];
+        }
+      }
+    }
+
+    return null;
+  }
 
   /**
    * Find the route handler for dynamic routes.
@@ -443,32 +462,25 @@ class Server extends event.EventEmitter {
   }
   dir(dirPath, httpPath) {
     if (!fs.existsSync(dirPath) || !fs.statSync(dirPath).isDirectory()) {
-      throw new Error("Directory does not exist: " + dirPath);
+      throw new ObsidianError("Directory does not exist: " + dirPath);
     }
 
-    // Serve directory listing when the basePath is accessed
-    this.addRoute(httpPath, "GET", (req, res) => {
-      const files = fs.readdirSync(dirPath);
+    this.addRoute(httpPath + "/*", "GET", (req, res) => {
+      let urlPath = req.path;
 
-      let html = "<ul>";
-      files.forEach((fileName) => {
-        const filePath = path.join(dirPath, fileName);
-        const routePath = path.join(httpPath, fileName);
-        const isDirectory = fs.statSync(filePath).isDirectory();
-        const linkText = isDirectory ? fileName + "/" : fileName;
-        html += `<li><a href="${routePath}">${linkText}</a></li>`;
-      });
-      html += "</ul>";
-      res.send(html);
-    });
+      // Remove the httpPath from the urlPath
+      urlPath = urlPath.replace(httpPath, "");
 
-    // Serve files within the directory
-    fs.readdirSync(dirPath).forEach((fileName) => {
-      const filePath = path.join(dirPath, fileName); // Use path.join for file paths
-      const routePath = path.join(httpPath, fileName).replace(/\\/g, "/"); // Replace backslashes with forward slashes
-      this.addRoute(routePath, "GET", (req, res) => {
+      // Decode URL-encoded characters
+      urlPath = decodeURIComponent(urlPath);
+
+      const filePath = path.join(dirPath, urlPath);
+
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
         res.file(filePath);
-      });
+      } else {
+        res.send("404 File not found").status(404);
+      }
     });
   }
 

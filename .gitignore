@@ -10,4 +10,5 @@ cache
 **/electron/electron-**
 out
 test
+images
 ```

@@ -86,6 +86,7 @@ function getPosts(page = 1, by = "date", order = "asc") {
   )
     .then((response) => response.json())
     .then((data) => {
+      console.log(data.length);
       forumContainer.innerHTML = "";
       const result = data;
       if (result.length > 0) {

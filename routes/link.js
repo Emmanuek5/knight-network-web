@@ -57,19 +57,6 @@ router.post("/:id", (req, res) => {
     //let it expire in 24 hours
     if (link.time + 86400000 > new Date().getTime()) {
       linksModel.findAndUpdate({ id }, { user_id: user.id, linked: true });
-      const response_url = link.response_url;
-      if (response_url) {
-        fetch(response_url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: user.id,
-            linked: true,
-          }),
-        });
-      }
       res
         .status(200)
         .json({ message: "Account linked successfully", success: true });
@@ -80,5 +67,60 @@ router.post("/:id", (req, res) => {
     res.status(400).json({ error: true, message: "The link is invalid" });
   }
 });
+
+router.get("/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  const link = linksModel.findOne({ uuid, linked: true });
+  if (link) {
+    res.status(200).json({ success: true, message: "Account linked" });
+  } else {
+    res.status(400).json({ error: true, message: "The User is not linked" });
+  }
+});
+
+router.get("/mc/:user", async (req, res) => {
+  const { user } = req.params;
+  const link = await linksModel.findOne({ user_id: user, linked: true });
+
+  if (link) {
+    try {
+      const response = await fetch(
+        "http://localhost:5500/api/player/" + link.uuid
+      );
+      const plainTextData = await response.text();
+
+      // Parse the plain text response into a JSON object
+      const playerData = parsePlainTextResponse(plainTextData);
+
+      const jsonResult = {
+        success: true,
+        message: "Account linked",
+        playerData,
+      };
+
+      res.status(200).json(jsonResult);
+    } catch (error) {
+      console.error("Error fetching player data:", error);
+      res.status(500).json({ error: true, message: "Internal server error" });
+    }
+  } else {
+    res.status(400).json({ error: true, message: "The User is not linked" });
+  }
+});
+
+// Function to parse plain text response into JSON object
+function parsePlainTextResponse(plainText) {
+  const lines = plainText.split("\n");
+  const playerData = {};
+
+  lines.forEach((line) => {
+    const [key, value] = line.split(": ");
+    if (key && value) {
+      playerData[key.trim()] = value.trim();
+    }
+  });
+
+  return playerData;
+}
 
 module.exports = router;

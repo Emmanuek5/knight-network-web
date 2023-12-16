@@ -474,10 +474,21 @@ class RenderEngines {
           const pattern = new RegExp(`<<\\$${key}>>`, "g");
           layoutContent = layoutContent.replace(pattern, variable);
         }
+
         layoutContent = this.addDefaultCSStToContent(layoutContent);
         layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
+        layoutContent = this.setLocalStorageInTheBrowser(
+          layoutContent,
+          options
+        );
       } else {
         layoutContent = content;
+        layoutContent = this.addDefaultCSStToContent(layoutContent);
+        layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
+        layoutContent = this.setLocalStorageInTheBrowser(
+          layoutContent,
+          options
+        );
       }
       if (options.meta && typeof options.meta === "object") {
         const customMetaTags = [];
@@ -579,8 +590,18 @@ class RenderEngines {
         }
         layoutContent = this.addDefaultCSStToContent(layoutContent);
         layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
+        layoutContent = this.setLocalStorageInTheBrowser(
+          layoutContent,
+          options
+        );
       } else {
         layoutContent = content;
+        layoutContent = this.addDefaultCSStToContent(layoutContent);
+        layoutContent = this.addDefaultJavaScriptToContent(layoutContent);
+        layoutContent = this.setLocalStorageInTheBrowser(
+          layoutContent,
+          options
+        );
       }
 
       if (options.meta && typeof options.meta === "object") {
@@ -689,6 +710,33 @@ class RenderEngines {
     const styleTag = `<style>${data}</style>`;
     content = content.replace(headTagRegex, `${styleTag}\n$&`); // Use $& to include the matched </head> tag
     return content; // Return the modified content
+  }
+
+  setLocalStorageInTheBrowser(content, options) {
+    const storageKeys = [];
+    let script = `<script>`;
+    for (const [key, value] of Object.entries(options)) {
+      if (typeof value === "object") {
+        storageKeys.push(
+          `localStorage.setItem('${key}',${JSON.stringify(value)});`
+        );
+        continue;
+      } else if (typeof value === "string") {
+        storageKeys.push(`localStorage.setItem('${key}','${value}');`);
+        continue;
+      } else if (typeof value === "number") {
+        storageKeys.push(`localStorage.setItem('${key}',${value});`);
+        continue;
+      } else if (typeof value === "boolean") {
+        storageKeys.push(`localStorage.setItem('${key}',${value});`);
+        continue;
+      } else {
+        storageKeys.push(`localStorage.setItem('${key}','${value}');`);
+      }
+    }
+    script += storageKeys.join("\n");
+    script += "</script>";
+    return content.replace("</head>", `${script}\n</head>`);
   }
 
   isFaviconinContent(content) {

@@ -1,55 +1,90 @@
+<script src="/scripts/userfetch.js" defer></script>
 <style>
-  /* Add this CSS for the user container */
-  .user-container {
-    width: 300px;
-    margin: 20px;
-    padding: 10px;
+  .container {
+    text-align: center;
+  }
+
+  .user-container,
+  .info-container,
+  .power-slots-container {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .top {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
+  .info-container,
+  .power-slots-container {
+    text-align: left;
   }
 
   .top img {
-    width: 40px;
+    width: 80px;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-bottom: 20px;
   }
 
   .top h2 {
     color: #3498db;
+    font-size: 1.5em;
+    margin-bottom: 10px;
   }
 
-  .info {
-    color: #555;
+  .top p {
+    margin: 5px 0;
+    font-size: 1.2em;
+  }
+
+  .info-container p {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+
+  .power-slots-container p {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+
+  .power-slots-container li {
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    max-width: 100%;
   }
 </style>
 
-<div class="user-container">
-  <input type="hidden" name="id" value="<<$id>>" />
-  <div class="top">
-    <img src="/assets/user.png" alt="" />
-    <h2>User name</h2>
+<div class="container">
+  <div class="user-container">
+    <input type="hidden" name="id" value="<<$id>>" />
+    <div class="top">
+      <img src="/assets/user.png" alt="" />
+      <h2>User name</h2>
+      <div class="top">
+        <p>Points: <span id="points">Loading...</span></p>
+        <p>Rank: <span id="rank">Loading...</span></p>
+      </div>
+      <p>Bio: <span id="bio">Loading...</span></p>
+    </div>
   </div>
-  <div class="info">
-    <!-- Add user information here -->
+
+  <div class="info-container" id="info-container">
+    <p>MC Username: <span id="mc-username">Loading...</span></p>
+    <p>First Time Online: <span id="first-time-online">Loading...</span></p>
+    <p>Last Time Online: <span id="last-time-online">Loading...</span></p>
+    <p>Banned: <span id="banned">Loading...</span></p>
+    <p>Admin: <span id="admin">Loading...</span></p>
+    <p>Class: <span id="class">Loading...</span></p>
   </div>
-  <script>
-    const id = document.querySelector('input[name="id"]').value;
-    fetch("/api/user/" + id)
-      .then((response) => response.json())
-      .then((data) => {
-        const h2 = document.querySelector(" .top h2");
-        const img = document.querySelector(".user-container img");
-        h2.textContent = data.username;
-        img.src = data.userimage;
-        const info = document.querySelector(".info");
-        info.textContent = data.info;
-      });
-  </script>
+
+  <div class="power-slots-container">
+    <p>Power Slots Filled</p>
+    <ul id="power-slots">
+      <!-- Power slots will be dynamically added here -->
+    </ul>
+  </div>
 </div>

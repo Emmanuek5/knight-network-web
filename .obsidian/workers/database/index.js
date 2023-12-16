@@ -830,11 +830,30 @@ class Table extends EventEmitter {
     // Emit the 'save' event after deleting a row
   }
 
-  findAndDeleteOne(query) {
+  findOneAndDelete(query) {
     const results = this.find(query);
     if (results.length > 0) {
       const row = results[0];
       this.data.splice(this.data.indexOf(row), 1);
+      return true;
+    } else {
+      return false;
+    }
+    // Emit the 'save' event after deleting a row
+  }
+
+  /**
+   * Deletes rows from the data array that match the given query.
+   *
+   * @param {Object} query - The query object used to filter the rows.
+   * @return {boolean} Returns true if any rows were deleted, false otherwise.
+   */
+  delete(query) {
+    const results = this.find(query);
+    if (results.length > 0) {
+      for (const row of results) {
+        this.data.splice(this.data.indexOf(row), 1);
+      }
       return true;
     } else {
       return false;

@@ -10,6 +10,7 @@ const pagesPath = path.join(defaultPath, "pages");
 const routesPath = path.join(defaultPath, "routes");
 const tablesPath = path.join(defaultPath, "models");
 const { spawn } = require("child_process");
+const ObsidianError = require("../classes/ObsidianError");
 const requestCount = new Map();
 let portdb = null;
 let url = null;
@@ -138,6 +139,10 @@ function registerRoute(route, folder, fileName) {
     // You can customize this part based on your rendering logic
     const params = req.params;
     params.authenticated = req.session.user ? true : false;
+    //Let's add the current page to the params
+    //let it check if the current page is the index of a folder or not
+    params.current_page = fileName === "index" ? folder : fileName;
+
     path.join(process.cwd(), `/pages/${folder}/${fileName}`);
     const filename = path.basename(`${folder}/${fileName}`);
     res.render(`${folder}/${filename}`, params);
@@ -161,9 +166,9 @@ if (asset_dirs) {
     let dir = path.join(process.cwd(), asset_dir.path) || "";
     let httpPath = asset_dir.url || "";
     if (!fs.existsSync(dir) || !fs.lstatSync(dir).isDirectory()) {
-      throw new Error("Directory does not exist: " + dir);
+      throw new ObsidianError("Directory does not exist: " + dir);
     }
-    app.dir(dir, httpPath);
+    app.dir(path.join(process.cwd(), asset_dir.path), httpPath);
   }
 }
 

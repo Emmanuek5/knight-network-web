@@ -1,8 +1,173 @@
-<h2>With Node.js <code>"http"</code> module</h2>
-<form action="/api/upload" enctype="multipart/form-data" method="post">
-  <div>Text field title: <input type="text" name="title" /></div>
-  <div>
-    File: <input type="file" name="multipleFiles" multiple="multiple" />
-  </div>
-  <input type="submit" value="Upload" />
-</form>
+<style>
+  .profile-container {
+    width: 400px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    align-self: center;
+    align-items: center;
+    position: absolute;
+    top: 18%;
+    left: 35%;
+  }
+
+  h1 {
+    color: #3498db;
+    text-align: center;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  label {
+    margin-top: 10px;
+    color: #555;
+  }
+
+  input,
+  textarea,
+  select {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+
+  input[type="submit"] {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  input[type="submit"]:hover {
+    background-color: #2980b9;
+  }
+
+  img {
+    max-width: 100%;
+    margin-top: 10px;
+    border-radius: 5px;
+  }
+
+  #imagePreviewContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+</style>
+<div class="profile-container">
+  <h1>User Settings</h1>
+  <form action="" class="form1">
+    <label for="username">Username</label>
+    <input type="text" name="username" id="username" />
+    <label for="email">Email</label>
+    <input type="email" name="email" id="email" />
+    <label for="bio"> Bio</label>
+    <textarea name="bio" id="bio" cols="30" rows="10"></textarea>
+    <label for="image">Image</label>
+    <input type="text" name="image" id="image" />
+    <input type="submit" value="Save" />
+  </form>
+
+  <h1>Upload Image</h1>
+  <form action="" class="form2">
+    <div id="imagePreviewContainer">
+      <img id="imagePreview" src="#" alt="Image Preview" />
+    </div>
+    <input type="file" name="image" id="imageInput" />
+    <!-- Image preview container -->
+
+    <input type="submit" value="Upload" />
+  </form>
+</div>
+<script>
+  if (!authenticated) {
+    window.location.href = "/auth/login";
+  }
+  const imageInput = document.getElementById("imageInput");
+  const imagePreview = document.getElementById("imagePreview");
+  const imagePreviewContainer = document.getElementById(
+    "imagePreviewContainer"
+  );
+
+  const form = document.querySelector(".form1");
+  const form2 = document.querySelector(".form2");
+  imagePreview.style.display = "none";
+  // Display image preview
+  imageInput.addEventListener("change", (event) => {
+    imagePreview.style.display = "block";
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        imagePreview.src = e.target.result;
+        imagePreviewContainer.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    } else {
+      imagePreview.src = "#";
+      imagePreviewContainer.style.display = "none";
+    }
+  });
+
+  function getSettings() {
+    fetch("/api/user/current")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          error(data.error);
+        }
+        const { username, email, bio, image } = data;
+        form.username.value = username;
+        form.email.value = email;
+        form.bio.value = bio;
+        form.image.value = image;
+      });
+  }
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const username = form.username.value;
+    const email = form.email.value;
+    const bio = form.bio.value;
+    const image = form.image.value;
+    const json = {
+      username,
+      email,
+      bio,
+      image,
+    };
+    fetch("/api/user/current", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(json),
+    });
+  });
+  form2.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(form2);
+    fetch("/api/user/current/image", {
+      method: "POST",
+      body: formData,
+    }).then((response) => {
+      if (response.ok) {
+        message("Image uploaded successfully");
+        getSettings();
+      } else {
+        error("Failed to upload image:" + response.statusText);
+      }
+    });
+  });
+
+  getSettings();
+</script>

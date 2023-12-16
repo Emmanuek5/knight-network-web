@@ -50,11 +50,15 @@ table.setSchema({
   },
   mc_uuid: {
     type: "string",
-    default: null,
+    default: "",
   },
   linked: {
     type: "boolean",
     default: false,
+  },
+  forumPosts: {
+    type: "object",
+    default: [],
   },
 });
 

@@ -36,7 +36,7 @@ function modal(type, title, content, options) {
       if (event.target === modalElement) closeModal(null);
     };
 
-    if (type === "question" && options) {
+    if (type === "question") {
       const buttonsHtml = `
         <div class="button-container">
           <button class="button" id="modalYesButton">${
@@ -91,16 +91,24 @@ function modal(type, title, content, options) {
       Array.isArray(options.inputs)
     ) {
       const inputsHtml = options.inputs
-        .map(
-          (input) => `
-      <div class="input-container">
-        <label for="${input.name}">${input.label || input.name}</label>
-        <input class="input-field" type="${input.type || "text"}" id="${
-            input.name
-          }" placeholder="${input.placeholder || ""}">
-      </div>
-    `
-        )
+        .map((input) => {
+          if (input.type === "textarea") {
+            return `
+                <div class="input-container">
+                  <label>${input.label}</label>
+                  <textarea id="${input.name}" >${input.value || ""}</textarea>
+                </div>
+              `;
+          }
+          return `
+                <div class="input-container">
+                  <label>${input.label}</label>
+                  <input id="${input.name}" type="${
+            input.type || "text"
+          }" value="${input.value || ""}">
+                </div>
+              `;
+        })
         .join("");
       const contentDiv = modalElement.querySelector(".modal-content");
       contentDiv.insertAdjacentHTML("beforeend", inputsHtml);
@@ -271,4 +279,8 @@ function notify(title, body, image, options, onClick) {
       }
     });
   }
+}
+
+function getValue(key) {
+  return localStorage.getItem(key);
 }

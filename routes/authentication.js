@@ -50,7 +50,9 @@ router.post("/signup", (req, res) => {
 
   const data = userModel.findByOr({ username, email });
   if (data.length > 0) {
-    res.status(400).json({ error: true, message: "Username already exists" });
+    res
+      .status(400)
+      .json({ error: true, message: "Username or email already exists" });
     return;
   }
   const securePasswordRegex =

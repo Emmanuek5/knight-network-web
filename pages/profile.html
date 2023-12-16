@@ -1,102 +1,172 @@
+<script src="/scripts/profile.js" defer></script>
 <style>
-  /* Add this CSS for the profile container */
-  .profile-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 400px;
-    margin: 20px;
+  .container {
+    text-align: center;
+  }
+
+  .user-container,
+  .info-container,
+  .forum_posts_container {
+    width: 80%;
+    margin: 20px auto;
     padding: 20px;
-    background-color: #fff;
+    background-color: #f8f9fa;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
-  h1 {
+  .info-container,
+  .forum_posts_container {
+    text-align: left;
+  }
+
+  .top img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    border: 2px solid #3498db;
+  }
+
+  .top h2 {
     color: #3498db;
+    font-size: 1.5em;
+    margin-bottom: 10px;
   }
 
-  form {
-    display: flex;
-    flex-direction: column;
-  }
-
-  label {
-    margin-top: 10px;
+  .top p {
+    margin: 5px 0;
+    font-size: 1.2em;
     color: #555;
   }
 
-  input,
-  textarea {
+  .info-container p,
+  .forum_posts_container .post p {
+    font-size: 1.2em;
     margin-bottom: 10px;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    color: #333;
   }
 
-  input[type="submit"] {
-    background-color: #3498db;
-    color: #fff;
-    border: none;
+  .forum_posts_container .posts {
+    max-height: 300px; /* Set the desired height */
+    overflow-y: auto;
+  }
+
+  .forum_posts_container .post {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+  }
+
+  .forum_posts_container .post p {
+    margin: 0;
+    color: #444;
+  }
+
+  .forum_posts_container .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .forum_posts_container h2,
+  #sort_by {
+    margin: 0;
+  }
+
+  #sort_by {
+    padding: 8px;
     border-radius: 5px;
-    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  .bottom_bar .pagination-wheel {
+    display: flex;
+    justify-content: center;
+    /* Center the pagination wheel */
+    margin-top: 10px;
+  }
+
+  .bottom_bar .pagination-wheel button {
+    background-color: #ddd;
+    color: #333;
+    border: none;
+    padding: 8px 12px;
+    margin: 0 2px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
+    border-radius: 5px;
   }
 
-  input[type="submit"]:hover {
-    background-color: #2980b9;
+  .bottom_bar .pagination-wheel button:hover {
+    background-color: #3498db;
+    color: #fff;
+  }
+  .forum_posts_container .post .actions {
+    display: flex;
+    justify-content: flex-end; /* Align to the right */
+    margin-top: 10px;
+  }
+
+  .forum_posts_container .post .actions button {
+    background-color: #3498db;
+    color: #fff;
+    height: 30px;
+    width: 100px;
+    border: none;
+    padding: 5px 10px;
+    margin-left: 5px; /* Add margin to separate buttons */
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 5px;
+  }
+
+  .forum_posts_container .post .actions button.edit {
+    background-color: #2ecc71;
+  }
+
+  .forum_posts_container .post .actions button.delete {
+    background-color: #e74c3c;
   }
 </style>
 
-<div class="profile-container">
-  <h1>User Profile</h1>
-  <form action="">
-    <label for="username">Username</label>
-    <input type="text" name="username" id="username" />
-    <label for="email">Email</label>
-    <input type="email" name="email" id="email" />
-    <label for="bio"> Bio</label>
-    <textarea name="bio" id="bio" cols="30" rows="10"></textarea>
-    <label for="image">Image</label>
-    <input type="text" name="image" id="image" />
-    <input type="submit" value="Save" />
-  </form>
+<div class="container">
+  <div class="user-container">
+    <div class="top">
+      <img src="https://i.pravatar.cc/300" alt="Profile Picture" />
+      <h2>Username</h2>
+    </div>
+  </div>
+  <div class="info-container">
+    <p>Points: 0</p>
+    <p>Rank: Unranked</p>
+    <p>Bio: No bio</p>
+  </div>
+  <div class="forum_posts_container">
+    <div class="top">
+      <h2>Your Forum Posts</h2>
+      <select name="sort_by" id="sort_by">
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="most_liked">Most Liked</option>
+        <option value="least_liked">Least Liked</option>
+        <option value="most_disliked">Most Disliked</option>
+        <option value="least_disliked">Least Disliked</option>
+      </select>
+    </div>
+    <div class="posts"></div>
+    <div class="bottom_bar">
+      <p></p>
+
+      <div class="bottom_bar">
+        <div class="pagination-wheel">
+          <button id="prevPage"><i class="fas fa-angle-left"></i></button>
+          <div class="wheel"></div>
+          <button id="nextPage"><i class="fas fa-angle-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<script>
-  if (!authenticated) {
-    window.location.href = "/auth/login";
-  }
-  fetch("/api/user/current")
-    .then((response) => response.json())
-    .then((data) => {
-      const form = document.querySelector("form");
-      const { username, email, bio, image } = data;
-      form.username.value = username;
-      form.email.value = email;
-      form.bio.value = bio;
-      form.image.value = image;
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const username = form.username.value;
-        const email = form.email.value;
-        const bio = form.bio.value;
-        const image = form.image.value;
-        const json = {
-          username,
-          email,
-          bio,
-          image,
-        };
-        fetch("/api/user/current", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(json),
-        });
-      });
-    });
-  const form = document.querySelector("form");
-</script>
