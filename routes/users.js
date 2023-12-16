@@ -86,7 +86,11 @@ router.post("/current/image", (req, res) => {
               res.status(400).json({ error: "Error uploading image" });
             } else {
               user.image = fname;
-              userModel.findOneAndUpdate({ id: user.id }, { image: fname });
+
+              userModel.findOneAndUpdate(
+                { id: user.id },
+                { image: "/" + fname }
+              );
               res.status(200).json({ message: "Image uploaded successfully" });
             }
           });

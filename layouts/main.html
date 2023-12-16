@@ -61,10 +61,10 @@
       <p id="error-message"></p>
     </div>
     <script>
-      const title = document.querySelector("title");
+      const page_title = document.querySelector("title");
       let current_page = getValue("current_page");
       if (current_page) {
-        title.innerHTML += ` | ${
+        page_title.innerHTML += ` | ${
           current_page[0].toUpperCase() + current_page.slice(1)
         }`;
       }
