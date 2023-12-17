@@ -83,7 +83,7 @@ router.post("/current/image", (req, res) => {
           let fPath = path.join(__dirname, "..", fname);
           image[0].mv(fPath, (err) => {
             if (err) {
-              res.status(400).json({ error: "Error uploading image" });
+              res.status(400).json({ error: true, message: err });
             } else {
               user.image = fname;
 
@@ -91,17 +91,20 @@ router.post("/current/image", (req, res) => {
                 { id: user.id },
                 { image: "/" + fname }
               );
-              res.status(200).json({ message: "Image uploaded successfully" });
+              res.status(200).json({
+                success: true,
+                message: "Image uploaded successfully",
+              });
             }
           });
         } else {
-          res.status(400).json({ error: "Invalid image type" });
+          res.status(400).json({ error: true, message: "Invalid image type" });
         }
       } else {
-        res.status(400).json({ error: "No image uploaded" });
+        res.status(400).json({ error: true, message: "No image provided" });
       }
     } else {
-      res.status(400).json({ error: "User not found" });
+      res.status(400).json({ error: true, message: "User not found" });
     }
   } catch (error) {
     console.error("Error:", error);
