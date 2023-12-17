@@ -101,7 +101,11 @@ router.get("/mc/:user", async (req, res) => {
       res.status(200).json(jsonResult);
     } catch (error) {
       console.error("Error fetching player data:", error);
-      res.status(500).json({ error: true, message: "Internal server error" });
+      res.status(500).json({
+        error: true,
+        message:
+          "Error fetching player data, The Minecraft server cannot be reached",
+      });
     }
   } else {
     res.status(400).json({ error: true, message: "The User is not linked" });
