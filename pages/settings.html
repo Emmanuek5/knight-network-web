@@ -159,14 +159,18 @@
     fetch("/api/user/current/image", {
       method: "POST",
       body: formData,
-    }).then((response) => {
-      if (response.ok) {
-        message("Image uploaded successfully");
-        getSettings();
-      } else {
-        error("Failed to upload image:" + response.statusText);
-      }
-    });
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          message("Image uploaded successfully");
+          getSettings();
+        } else {
+          error("Failed to upload image:" + response.message);
+        }
+      });
   });
 
   getSettings();
