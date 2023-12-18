@@ -9,10 +9,10 @@ const { EventEmitter } = require("events");
 const eventEmitter = new EventEmitter();
 
 class App extends EventEmitter {
-  constructor() {
+  constructor(options) {
     super();
     this.config = new Config();
-    this.server = new Server(this.config.get("view_engine"));
+    this.server = new Server(this.config.get("view_engine"), options);
     this.cache = {};
     this.engines = {};
     this.locals = Object.create(null);

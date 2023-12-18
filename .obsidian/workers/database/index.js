@@ -711,6 +711,7 @@ class Table extends EventEmitter {
         results.push({ ...row }); // Create a new object for each row
       }
     }
+    results.reverse(); // Reverse the results array to preserve the original order
     return results; // Return the results array with new objects
   }
 

@@ -1,4 +1,5 @@
 const http = require("http");
+const https = require("https");
 const { Request } = require("./request");
 const { Response } = require("./response");
 const event = require("events");
@@ -13,10 +14,32 @@ const sessions = [];
 const zlib = require("zlib"); //
 const url = require("url");
 const ObsidianError = require("../../../../classes/ObsidianError");
+
 class Server extends event.EventEmitter {
-  constructor(viewEngine) {
+  constructor(viewEngine, options = {}) {
     super();
-    this.server = http.createServer(this.handleRequest.bind(this));
+
+    // Create an HTTP server
+    this.server = http.createServer((req, res) => {
+      this.handleRequest(req, res);
+    });
+
+    // Check if certificate and key options are provided for HTTPS
+    if (options.cert && options.key) {
+      // Create an HTTPS server with certificate and key to listen on port 443
+      this.httpsServer = https.createServer({
+        cert: fs.readFileSync(options.cert),
+        key: fs.readFileSync(options.key),
+        ca: fs.readFileSync(options.ca),
+      });
+
+      // You might want to handle HTTPS requests in a similar way as HTTP requests
+      this.httpsServer.on("request", (req, res) => {
+        this.handleRequest(req, res);
+      });
+      this.httpsServer.listen(443);
+    }
+
     this.routes = {};
     this.on = eventEmitter.on;
     this.emit = eventEmitter.emit;
@@ -445,11 +468,16 @@ class Server extends event.EventEmitter {
 
           if (isMatch) {
             // Found a match for dynamic route parameters
-            return (req, res) => {
-              // Pass the parameters to the handler
-              req.params = params;
-              this.routes[routePath][method](req, res);
-            };
+
+            if (this.routes[routePath][method]) {
+              return (req, res) => {
+                // Pass the parameters to the handler
+                req.params = params;
+                this.routes[routePath][method](req, res);
+              };
+            } else {
+              return null;
+            }
           }
         }
       }

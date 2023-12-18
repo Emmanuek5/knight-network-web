@@ -1,12 +1,11 @@
-const { App, Router, Server,Request, Response } = require("./application");
+const { App, Router, Server, Request, Response } = require("./application");
 const bodyParser = require("body-parser");
 const { Build } = require("./utils/builder");
 // Create an express-like application
 exports = module.exports = createApplication;
 
-function createApplication() {
-  
-  const app = new App();
+function createApplication(options = {}) {
+  const app = new App(options);
   return app;
 }
 

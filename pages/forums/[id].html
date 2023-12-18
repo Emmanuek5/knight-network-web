@@ -1,3 +1,4 @@
+<script src="/scripts/id.js" defer></script>
 <style>
   /* Add this CSS for the post view container */
   .forum_post_view_container {
@@ -75,27 +76,6 @@
     margin-top: 20px;
   }
 
-  .comment {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .comment img {
-    width: 30px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-
-  .comment h4 {
-    margin-right: auto;
-    color: #e74c3c; /* Red color for comment username */
-  }
-
-  .comment p {
-    color: #000;
-  }
-
   a {
     text-decoration: none;
     color: #3498db;
@@ -124,6 +104,171 @@
     align-items: center;
     gap: 5px; /* Adjust spacing as needed */
   }
+
+  .comments_container {
+    width: 60%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between; /* Added to separate the items */
+    margin-bottom: 10px;
+  }
+
+  .reply {
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Change to column direction */
+  }
+
+  .reply form {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px; /* Add margin to create space between form and selector */
+  }
+
+  .reply input[type="text"],
+  .reply input[type="submit"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+    transition: border-color 0.3s;
+    margin-bottom: 10px;
+  }
+
+  .reply input[type="submit"] {
+    background-color: #3498db;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .reply input[type="submit"]:hover {
+    background-color: #2980b9;
+  }
+
+  .selector {
+    margin-left: auto; /* Pushes the selector to the right side */
+  }
+
+  .selector select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+  }
+
+  .selector select:hover {
+    border-color: #2980b9;
+  }
+
+  .selector select:focus {
+    outline: none;
+    border-color: #3498db;
+  }
+
+  .middle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align to the right */
+    margin-bottom: 10px; /* Add margin to create space between form and selector */
+  }
+
+  #comments_container {
+    overflow-y: auto;
+    max-height: 600px;
+  }
+
+  .no_comments {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 20px;
+    font-style: italic;
+  }
+
+  .comment {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .comment_top {
+    display: flex;
+    align-items: center;
+  }
+
+  .comment_top img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .comment_top .user_details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .comment_top h2 {
+    margin: 0; /* Remove margin to avoid extra spacing */
+    color: #3498db;
+  }
+
+  .comment_top p {
+    margin: 0; /* Remove margin to avoid extra spacing */
+    color: #95a5a6;
+  }
+
+  .comment_content p {
+    color: #000;
+  }
+  /* Add this CSS to your existing styles */
+  .comment_bottom button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px; /* Make the button rectangular */
+    padding: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    margin-left: 5px; /* Add spacing between buttons */
+  }
+
+  .comment_bottom .liked {
+    /* add green color */
+    background-color: #2ecc71;
+  }
+
+  .comment_bottom .disliked {
+    /* add red color */
+    background-color: #e74c3c;
+  }
+
+  .comment_bottom button span {
+    margin-right: 5px; /* Add spacing between icons and text */
+  }
+
+  .comment_bottom button:hover {
+    background-color: #2980b9;
+  }
+
+  /* Add this to style the reply button if needed */
+  .comment_bottom button:last-child {
+    background-color: #2ecc71;
+  }
+
+  .comment_bottom button:last-child:hover {
+    background-color: #27ae60;
+  }
 </style>
 
 <input type="hidden" name="forum_id" value="<<$id>>" />
@@ -140,7 +285,7 @@
       <span id="dislikeCount"></span>
       <i class="fa fa-thumbs-down"></i>
     </button>
-    <button>Report</button>
+    <button onclick="report()">Report</button>
   </div>
   <div class="forum_post_content">
     <h1>Title</h1>
@@ -152,155 +297,55 @@
     </p>
   </div>
 </div>
-<script>
-  const id = document.querySelector("input[name='forum_id']").value;
-  const forumPostView = document.querySelector(".forum_post_view_container");
-  const route = "/api/forums/";
-  const title = document.querySelector(".forum_post_content h1");
-  const userImage = document.querySelector(".top img");
-  const username = document.querySelector(".top h2");
-  const postDate = document.querySelector(".top p");
-  const likeButton = document.getElementById("likeButtonID");
-  const dislikeButton = document.getElementById("dislikeButtonID");
-  const reportButton = document.querySelector(".top button:nth-child(3)");
-  const likeCount = document.querySelector(".top p:nth-child(4)");
-  const dislikeCount = document.querySelector(".top p:nth-child(5)");
-  let hasLiked = false;
-  let hasDisliked = false;
-  async function fetchData() {
-    try {
-      const response = await fetch(route + id);
-      const data = await response.json();
-
-      if (data.error) {
-        displayError("Error Getting Forum posts from the server");
-        return;
-      }
-
-      userImage.src = data.userimageurl || "";
-      console.log(data, userImage);
-      title.textContent = data.title || "";
-      document.getElementById("likeCount").textContent = data.likes || 0;
-      document.getElementById("dislikeCount").textContent = data.dislikes || 0;
-      username.innerHTML = `<a href="/user/${data.userid}">${data.username}</a>`;
-      postDate.textContent = formatDate(data.date) || "";
-
-      const hasLikedResponse = await fetch(route + "hasliked/" + id);
-      const hasLikedData = await hasLikedResponse.json();
-      updateLikedStatus(hasLikedData.liked);
-
-      const hasDislikedResponse = await fetch(route + "hasdisliked/" + id);
-      const hasDislikedData = await hasDislikedResponse.json();
-      updateDislikedStatus(hasDislikedData.disliked);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      displayError("Error fetching data from the server");
-    }
-  }
-
-  function updateLikedStatus(liked) {
-    if (liked) {
-      likeButton.classList.add("liked");
-      hasLiked = true;
-    } else {
-      likeButton.classList.remove("liked");
-      hasLiked = false;
-    }
-  }
-
-  function updateDislikedStatus(disliked) {
-    if (disliked) {
-      dislikeButton.classList.add("disliked");
-      hasDisliked = true;
-    } else {
-      dislikeButton.classList.remove("disliked");
-      hasDisliked = false;
-    }
-  }
-
-  async function updateCounts() {
-    try {
-      const response = await fetch(route + id);
-      const data = await response.json();
-
-      if (data.error) {
-        displayError("Error updating counts from the server");
-        return;
-      }
-
-      document.getElementById("likeCount").textContent = data.likes || 0;
-      document.getElementById("dislikeCount").textContent = data.dislikes || 0;
-
-      const hasLikedResponse = await fetch(route + "hasliked/" + id);
-      const hasLikedData = await hasLikedResponse.json();
-      updateLikedStatus(hasLikedData.liked);
-
-      const hasDislikedResponse = await fetch(route + "hasdisliked/" + id);
-      const hasDislikedData = await hasDislikedResponse.json();
-      updateDislikedStatus(hasDislikedData.disliked);
-    } catch (error) {
-      console.error("Error updating counts:", error);
-      displayError("Error updating counts from the server");
-    }
-  }
-
-  function like() {
-    if (!hasLiked) {
-      fetchAction(route + "like/" + id);
-    } else {
-      updateCounts();
-    }
-  }
-
-  function dislike() {
-    if (!hasDisliked) {
-      fetchAction(route + "dislike/" + id);
-    } else {
-      updateCounts();
-    }
-  }
-
-  function fetchAction(actionRoute) {
-    fetch(actionRoute, {
-      method: "POST",
-    })
-      .then((res) => {
-        if (res.ok) {
-          updateCounts();
-          if (actionRoute.includes("like")) {
-            likeButton.classList.add("liked");
-          } else if (actionRoute.includes("dislike")) {
-            dislikeButton.classList.add("disliked");
-          }
-        } else {
-          modal(
-            "",
-            `You already ${
-              actionRoute.includes("like") ? "liked" : "disliked"
-            } this post`,
-            `You can only ${
-              actionRoute.includes("like") ? "like" : "dislike"
-            } a post once`
-          );
-        }
-      })
-      .catch((error) => {
-        console.error("Error performing action:", error);
-      });
-  }
-
-  function displayError(message) {
-    error(message);
-  }
-
-  function formatDate(date) {
-    const options = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    };
-    return new Date(date).toLocaleDateString("en-US", options);
-  }
-
-  fetchData();
-</script>
+<div class="comments_container">
+  <div class="top">
+    <div class="reply">
+      <form action="">
+        <input
+          type="text"
+          name="comment"
+          id="reply"
+          placeholder="Enter a comment"
+        />
+        <input type="submit" value="Comment" />
+      </form>
+    </div>
+  </div>
+  <div class="middle">
+    <div class="selector">
+      <select name="sort_by" id="">
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="most_liked">Most Liked</option>
+        <option value="least_liked">Least Liked</option>
+        <option value="most_disliked">Most Disliked</option>
+        <option value="least_disliked">Least Disliked</option>
+      </select>
+    </div>
+  </div>
+  <div class="forum_post_comments" id="comments_container">
+    <!-- Comments will be added here //make an example comment -->
+    <div class="comment">
+      <div class="comment_top">
+        <img src="" alt="" />
+        <h2>Username</h2>
+        <p>Comment Date</p>
+      </div>
+      <div class="comment_content">
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores
+          nesciunt quis molestiae error laudantium deserunt quia possimus quae.
+          Nobis facere iusto deserunt corporis perferendis necessitatibus eos
+          et. Quidem, similique itaque.
+        </p>
+      </div>
+      <div class="comment_bottom">
+        <button onclick=" handleLike()"><i class="fa fa-thumbs-up"></i></button>
+        <button onclick=" handleDislike()">
+          <i class="fa fa-thumbs-down"></i>
+        </button>
+        <button><i class="fa fa-reply"></i></button>
+      </div>
+    </div>
+  </div>
+</div>

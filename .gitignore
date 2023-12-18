@@ -1,14 +1,19 @@
+## General
 node_modules
 data
 dist
 cookies
 obsidian.config.json
 cache
+## Electron
 **/electron/assets
 **/electron/public
 **/electron/pages
 **/electron/electron-**
+## Assets
 out
 test
 images
+## Certs
+certs
 ```

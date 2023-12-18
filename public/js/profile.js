@@ -108,7 +108,7 @@ function getPosts(page = 1, by = "date", order = "asc") {
         const postElement = document.createElement("div");
         postElement.innerHTML = `
           <div class="post">
-            <h3>${post.title}</h3>
+            <a href="/forums/${post.id}"><h3>${post.title}</h3></a>
             <p>${post.description}</p>
             <p>Posted on ${new Date(post.date).toLocaleString()}</p>
             <p>Likes: ${post.likes} | Dislikes: ${post.dislikes}</p>

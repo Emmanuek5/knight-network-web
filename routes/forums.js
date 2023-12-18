@@ -3,8 +3,10 @@ try {
   const router = new Router();
   const forumsModel = require("../models/forums");
   const usersModel = require("../models/users");
+  const repliesModel = require("../models/replies");
   const crypto = require("crypto");
   const uuid = require("uuid");
+  const f_reportsModel = require("../models/reports");
   router.basePath = "/forums";
 
   router.post("/new", (req, res) => {
@@ -125,6 +127,208 @@ try {
     }
   });
 
+  router.post("/reply/:id", (req, res) => {
+    const { id } = req.params;
+    const { comment } = req.body;
+    const user = req.session.user;
+    if (!user) {
+      res.status(403).json({ error: true, message: "You must be logged in" });
+      return;
+    }
+    const forumPost = forumsModel.findOne({ id });
+    if (forumPost) {
+      const replyid = uuid.v4();
+      repliesModel.insert({
+        id: replyid,
+        post_id: id,
+        user_id: user.id,
+        message: comment[0],
+        created_at: new Date().getTime(),
+      });
+      res.status(200).json({ message: "Reply created successfully" });
+    } else {
+      res.status(404).json({ error: true, message: "Forum post not found" });
+    }
+  });
+
+  router.get("/replies/:id/:by/:order/:page", (req, res) => {
+    const { id } = req.params;
+    const forumPost = forumsModel.findOne({ id });
+    const { by, order, page } = req.params;
+    const pageInt = parseInt(page);
+    let limit = 30;
+
+    if (forumPost) {
+      let replies = repliesModel.find({ post_id: id });
+      replies.forEach((reply) => {
+        const user = usersModel.findOne({ id: reply.user_id });
+        if (user) {
+          reply.username = user.username;
+          reply.imageurl = user.image;
+          //check if user has liked or disliked
+          if (reply.likedBy.includes(user.id)) {
+            reply.liked = true;
+          } else {
+            reply.liked = false;
+          }
+          if (reply.dislikedBy.includes(user.id)) {
+            reply.disliked = true;
+          } else {
+            reply.disliked = false;
+          }
+        }
+      });
+
+      if (by === "likes") {
+        replies.sort((a, b) => b.likes - a.likes);
+      }
+      if (by === "date") {
+        replies.sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
+      if (by === "dislikes") {
+        replies.sort((a, b) => b.dislikes - a.dislikes);
+      }
+
+      if (order === "desc") {
+        replies.reverse();
+      }
+      if (pageInt > 0) {
+        replies = replies.slice((pageInt - 1) * limit, pageInt * limit);
+      }
+      res.status(200).json({ replies });
+    } else {
+      res.status(404).json({ error: true, message: "Forum post not found" });
+    }
+  });
+
+  router.post("/reply/:id/like", (req, res) => {
+    const user = req.session.user;
+    if (!user) {
+      res.status(403).json({ error: true, message: "You must be logged in" });
+      return;
+    }
+    const { id } = req.params;
+    const reply = repliesModel.findOne({ id });
+    if (reply) {
+      if (reply.likedBy.includes(user.id)) {
+        res.status(200).json({ message: "Reply already liked" });
+        return;
+      }
+
+      if (reply.dislikedBy.includes(user.id)) {
+        const dislikedByIndex = reply.dislikedBy.indexOf(user.id);
+        reply.dislikedBy.splice(dislikedByIndex, 1);
+        repliesModel.findOneAndUpdate(
+          { id },
+          { dislikedBy: reply.dislikedBy, dislikes: reply.dislikes - 1 }
+        );
+      }
+
+      reply.likedBy.push(user.id);
+      repliesModel.findOneAndUpdate(
+        { id },
+        { likedBy: reply.likedBy, likes: reply.likes + 1 }
+      );
+
+      res
+        .status(200)
+        .json({ success: true, message: "Reply liked successfully" });
+    } else {
+      res.status(404).json({ error: true, message: "Reply not found" });
+    }
+  });
+
+  router.post("/reply/:id/dislike", (req, res) => {
+    const user = req.session.user;
+    if (!user) {
+      res.status(403).json({ error: true, message: "You must be logged in" });
+      return;
+    }
+    const { id } = req.params;
+    const reply = repliesModel.findOne({ id });
+    if (reply) {
+      if (reply.dislikedBy.includes(user.id)) {
+        res.status(200).json({ message: "Reply already disliked" });
+        return;
+      }
+
+      if (reply.likedBy.includes(user.id)) {
+        const likedByIndex = reply.likedBy.indexOf(user.id);
+        reply.likedBy.splice(likedByIndex, 1);
+        repliesModel.findOneAndUpdate(
+          { id },
+          { likedBy: reply.likedBy, likes: reply.likes - 1 }
+        );
+      }
+
+      reply.dislikedBy.push(user.id);
+      repliesModel.findOneAndUpdate(
+        { id },
+        { dislikedBy: reply.dislikedBy, dislikes: reply.dislikes + 1 }
+      );
+
+      res
+        .status(200)
+        .json({ success: true, message: "Reply disliked successfully" });
+    } else {
+      res.status(404).json({ error: true, message: "Reply not found" });
+    }
+  });
+
+  router.get("/reply/hasliked/:id", (req, res) => {
+    const user = req.session.user;
+    if (!user) {
+      res.status(403).json({ error: true, message: "You must be logged in" });
+      return;
+    }
+    const { id } = req.params;
+    const reply = repliesModel.findOne({ id });
+    if (reply) {
+      if (reply.likedBy.includes(user.id)) {
+        res.status(200).json({ liked: true });
+      } else {
+        res.status(200).json({ liked: false });
+      }
+    } else {
+      res.status(404).json({ error: true, message: "Reply not found" });
+    }
+  });
+
+  router.get("/reply/hasdisliked/:id", (req, res) => {
+    const user = req.session.user;
+    if (!user) {
+      res.status(403).json({ error: true, message: "You must be logged in" });
+      return;
+    }
+    const { id } = req.params;
+    const reply = repliesModel.findOne({ id });
+    if (reply) {
+      if (reply.dislikedBy.includes(user.id)) {
+        res.status(200).json({ disliked: true });
+      } else {
+        res.status(200).json({ disliked: false });
+      }
+    } else {
+      res.status(404).json({ error: true, message: "Reply not found" });
+    }
+  });
+
+  router.delete("/reply/:id", (req, res) => {
+    const user = req.session.user;
+    if (!user) {
+      res.status(403).json({ error: true, message: "You must be logged in" });
+      return;
+    }
+    const { id } = req.params;
+    const reply = repliesModel.findOne({ id, user_id: user.id });
+    if (reply) {
+      repliesModel.delete({ id });
+      res.status(200).json({ message: "Reply deleted successfully" });
+    } else {
+      res.status(404).json({ error: true, message: "Reply not found" });
+    }
+  });
+
   router.put("/:id/edit", (req, res) => {
     const user = req.session.user;
     if (!user) {
@@ -135,7 +339,7 @@ try {
     const { title, content } = req.body;
     const forumPost = forumsModel.findOne({ id, userid: user.id });
     if (forumPost) {
-      forumsModel.findAndUpdate({ id }, { title, content });
+      forumsModel.findOneAndUpdate({ id }, { title, content });
       res.status(200).json({ message: "Forum post updated successfully" });
     } else {
       res.status(404).json({ error: true, message: "Forum post not found" });
@@ -280,6 +484,32 @@ try {
       res.status(200).json({ disliked: true });
     } else {
       res.status(200).json({ disliked: false });
+    }
+  });
+
+  router.post("/report/:id", async (req, res) => {
+    const { id } = req.params;
+    const user = req.session.user;
+    if (!user) {
+      res.status(403).json({ error: true, message: "You must be logged in" });
+      return;
+    }
+    const data = await forumsModel.findOne({ id });
+    if (data) {
+      f_reportsModel.insert({
+        id: uuid.v4(),
+        user_id: user.id,
+        post_id: id,
+        reason: req.body.reason,
+        created_at: new Date().getTime(),
+      });
+
+      res.status(200).json({
+        message: "Forum post reported successfully",
+        success: true,
+      });
+    } else {
+      res.status(400).json({ error: true, message: "Forum post not found" });
     }
   });
 

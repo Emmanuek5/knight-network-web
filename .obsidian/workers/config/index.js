@@ -58,6 +58,12 @@ class Config {
         duration: 60,
         max: 100,
       },
+      secure_certs: {
+        enabled: false,
+        cert_path: path.join(process.cwd(), "certs", "cert.pem"),
+        key_path: path.join(process.cwd(), "certs", "key.pem"),
+        ca_path: path.join(process.cwd(), "certs", "ca.pem"),
+      },
       no_imports: false,
       view_engine: "html",
       db_port: 6379,

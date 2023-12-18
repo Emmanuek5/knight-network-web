@@ -1,8 +1,19 @@
 const { server, Config, Router, Table } = require("../../modules");
-const app = server();
+const path = require("path");
 const config = new Config();
 const port = config.get("port");
-const path = require("path");
+let options = {};
+const cert_options = config.get("secure_certs");
+
+if (cert_options.enabled) {
+  options = {
+    cert: path.join(__dirname, cert_options.cert_path),
+    key: path.join(__dirname, cert_options.key_path),
+    ca: path.join(__dirname, cert_options.ca_path),
+  };
+}
+const app = server(options);
+
 const fs = require("fs");
 const { Database } = require("../workers/database");
 const defaultPath = process.cwd();
