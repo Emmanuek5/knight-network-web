@@ -1,6 +1,23 @@
 const { spawn } = require("child_process");
 const readline = require("readline");
 const fs = require("fs");
+const { COLORS } = require("../workers");
+
+const logger = (message, color = COLORS.BLUE_TEXT) => {
+  console.log(
+    COLORS.YELLOW_TEXT +
+      "[CERTS GENERATOR] - " +
+      COLORS.applyColor(message, color)
+  );
+};
+
+const loggerError = (message, color = COLORS.RED_TEXT) => {
+  console.log(
+    COLORS.YELLOW_TEXT +
+      "[CERTS GENERATOR] - " +
+      COLORS.applyColor(message, color)
+  );
+};
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -10,9 +27,15 @@ const rl = readline.createInterface({
 // Function to get user input for domain
 const getUserInput = () => {
   return new Promise((resolve) => {
-    rl.question("Enter your domain: ", (domain) => {
-      resolve({ domain });
-    });
+    rl.question(
+      COLORS.BLUE_TEXT +
+        "Enter the domain: " +
+        COLORS.RESET +
+        COLORS.YELLOW_TEXT,
+      (domain) => {
+        resolve({ domain });
+      }
+    );
   });
 };
 
@@ -34,25 +57,30 @@ const generateSelfSignedCertificate = ({ domain }) => {
   const gitOpenSSLPath = "C:\\Program Files\\Git\\usr\\bin\\openssl.exe";
   const opensslCommand = `"${gitOpenSSLPath}" req -x509 -newkey rsa:4096 -nodes -sha256 -subj "/CN=${domain}" -keyout ${privateKeyFilePath} -out ${certFilePath} && "${gitOpenSSLPath}" x509 -outform PEM -in ${certFilePath} -out ${caFilePath}`;
 
-  console.log("Executing OpenSSL command:", opensslCommand);
+  logger(`Running command: ${opensslCommand}`);
 
   const opensslProcess = spawn(opensslCommand, { shell: true });
 
   opensslProcess.stdout.on("data", (data) => {
-    console.log(`OpenSSL output: ${data}`);
+    if (!data.startsWith(".") || data.startsWith("+")) {
+      logger(`OpenSSL output: ${data}`);
+    }
   });
 
   opensslProcess.stderr.on("data", (data) => {
-    console.error(`OpenSSL error: ${data}`);
+    const errorMessage = data.toString();
+    if (!errorMessage.startsWith(".") || errorMessage.startsWith("+")) {
+      loggerError(`OpenSSL error: ${data}`);
+    }
   });
 
   opensslProcess.on("close", (code) => {
     if (code === 0) {
-      console.log(
+      logger(
         `Self-signed certificate, private key, and CA file created and saved to ${certFilePath}, ${privateKeyFilePath}, and ${caFilePath}`
       );
     } else {
-      console.error(`Error running OpenSSL command. Exit code: ${code}`);
+      loggerError(`Error running OpenSSL command. Exit code: ${code}`);
     }
     rl.close();
   });
@@ -61,5 +89,6 @@ const generateSelfSignedCertificate = ({ domain }) => {
 // Call the function to get user input and generate the self-signed certificate, private key, and CA file
 (async () => {
   const userInput = await getUserInput();
+  logger("Generating self-signed certificate and private key...");
   generateSelfSignedCertificate(userInput);
 })();

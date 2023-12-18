@@ -1,11 +1,28 @@
 const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
+const { COLORS } = require("../workers");
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
+
+const logger = (message, color = COLORS.BLUE_TEXT) => {
+  console.log(
+    COLORS.YELLOW_TEXT +
+      "[CERTS GENERATOR] - " +
+      COLORS.applyColor(message, color)
+  );
+};
+
+const loggerError = (message, color = COLORS.RED_TEXT) => {
+  console.log(
+    COLORS.YELLOW_TEXT +
+      "[CERTS GENERATOR] - " +
+      COLORS.applyColor(message, color)
+  );
+};
 
 const baseLetEncryptPath = "/etc/letsencrypt/live"; // Adjust this to your Let's Encrypt base path
 
@@ -19,7 +36,7 @@ function copyCerts(domain) {
 
   // Check if the source path exists
   if (!fs.existsSync(sourcePath)) {
-    console.error(
+    loggerError(
       `Certificates for domain '${domain}' not found at '${sourcePath}'.`
     );
     return;
@@ -43,7 +60,9 @@ function copyCerts(domain) {
     path.join(destinationPath, privateKeyFileName)
   );
 
-  console.log(`Certificates for domain '${domain}' copied successfully.`);
+  logger(
+    `Certificates for domain '${domain}' to ${destinationPath}' copied successfully.`
+  );
 }
 
 // Prompt user for domain
