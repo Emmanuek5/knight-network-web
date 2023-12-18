@@ -60,9 +60,8 @@ class Config {
       },
       secure_certs: {
         enabled: false,
-        cert_path: path.join(process.cwd(), "certs", "cert.pem"),
-        key_path: path.join(process.cwd(), "certs", "key.pem"),
-        ca_path: path.join(process.cwd(), "certs", "ca.pem"),
+        cert_path: "certs/fullchain.pem",
+        key_path: "certs/privkey.pem",
       },
       no_imports: false,
       view_engine: "html",
