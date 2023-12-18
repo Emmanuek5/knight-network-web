@@ -9,7 +9,6 @@ if (cert_options.enabled) {
   options = {
     cert: path.join(__dirname, cert_options.cert_path),
     key: path.join(__dirname, cert_options.key_path),
-    ca: path.join(__dirname, cert_options.ca_path),
   };
 }
 const app = server(options);

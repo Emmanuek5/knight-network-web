@@ -30,7 +30,6 @@ class Server extends event.EventEmitter {
       this.httpsServer = https.createServer({
         cert: fs.readFileSync(options.cert),
         key: fs.readFileSync(options.key),
-        ca: fs.readFileSync(options.ca),
       });
 
       // You might want to handle HTTPS requests in a similar way as HTTP requests
