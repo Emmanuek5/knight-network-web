@@ -11,7 +11,7 @@ router.post("/login", (req, res) => {
   const emailregex =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
   let data;
-
+  console.log(username, password);
   if (username && password) {
     if (emailregex.test(username)) {
       data = userModel.findOne({ email: username });
