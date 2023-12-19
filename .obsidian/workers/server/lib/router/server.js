@@ -33,6 +33,7 @@ class Server extends event.EventEmitter {
         this.handleRequest.bind(this)
       );
       this.httpsServer.listen(443);
+    } else {
     }
 
     this.routes = {};
