@@ -102,8 +102,13 @@ class Request {
           });
 
           Object.keys(fields).forEach((fieldName) => {
-            // Use the dynamic field name
-            this.body[fieldName] = fields[fieldName][0]; // Get the first item in the array
+            if (Array.isArray(fields[fieldName])) {
+              // If it's an array, use the first item
+              this.body[fieldName] = fields[fieldName][0];
+            } else {
+              // If it's not an array, use it directly
+              this.body[fieldName] = fields[fieldName];
+            }
           });
 
           // Use the dynamic field name for files

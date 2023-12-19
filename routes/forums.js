@@ -142,7 +142,7 @@ try {
         id: replyid,
         post_id: id,
         user_id: user.id,
-        message: comment[0],
+        message: comment,
         created_at: new Date().getTime(),
       });
       res.status(200).json({ message: "Reply created successfully" });
