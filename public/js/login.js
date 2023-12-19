@@ -28,27 +28,12 @@ if (currentlocation.includes("signup")) {
 } else if (currentlocation.includes("login")) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    let username = "";
-    let password = "";
-    for (let input of inputs) {
-      if (input.name === "username") {
-        username = input.value;
-      } else if (input.name === "password") {
-        password = input.value;
-      }
-    }
 
-    const json = {
-      username: username,
-      password: password,
-    };
+    const formData = new FormData(form);
 
     const response = await fetch(route1, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(json),
+      body: formData,
     });
     const result = await response.json();
     if (result.success) {
