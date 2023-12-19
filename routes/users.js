@@ -72,16 +72,17 @@ router.get("/current/profile", (req, res) => {
 router.post("/current/image", (req, res) => {
   const { files } = req;
   const user = req.user;
+  console.log(files);
   try {
     if (user) {
       const { image } = files;
       if (image) {
-        const { type } = image[0];
+        const { type } = image;
         if (type.startsWith("image/")) {
-          const name = image[0].name;
+          const name = image.name;
           let fname = "assets/images/" + name;
           let fPath = path.join(__dirname, "..", fname);
-          image[0].mv(fPath, (err) => {
+          image.mv(fPath, (err) => {
             if (err) {
               res.status(400).json({ error: true, message: err });
             } else {

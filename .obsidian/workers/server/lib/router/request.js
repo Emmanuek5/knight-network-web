@@ -76,21 +76,20 @@ class Request {
         if (err) {
           reject(err);
         } else {
-          this.body = fields;
-          // Format files array with field names as keys
+          this.body = {};
           this.files = {};
 
           Object.keys(files).forEach((fieldName) => {
             const fieldFiles = files[fieldName];
+            const firstFile = fieldFiles[0];
 
-            this.files[fieldName] = fieldFiles.map((file) => ({
-              name: file.originalFilename,
-              temp: file.filepath,
-              type: file.mimetype,
-              size: file.size,
+            this.files[fieldName] = {
+              name: firstFile.originalFilename,
+              temp: firstFile.filepath,
+              type: firstFile.mimetype,
+              size: firstFile.size,
               mv: (path, callback) => {
-                // Move file to destination without fs.rename
-                fs.copyFile(file.filepath, path, (err) => {
+                fs.copyFile(firstFile.filepath, path, (err) => {
                   if (err) {
                     callback(err);
                   } else {
@@ -99,9 +98,18 @@ class Request {
                 });
               },
               // Add other properties as needed
-            }));
+            };
           });
-          this.file = this.files[0];
+
+          Object.keys(fields).forEach((fieldName) => {
+            // Use the dynamic field name
+            this.body[fieldName] = fields[fieldName][0]; // Get the first item in the array
+          });
+
+          // Use the dynamic field name for files
+          const dynamicFieldName = Object.keys(this.files)[0];
+          this.file = this.files[dynamicFieldName];
+
           resolve();
         }
       });
