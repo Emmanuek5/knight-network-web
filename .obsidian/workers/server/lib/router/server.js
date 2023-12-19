@@ -20,22 +20,18 @@ class Server extends event.EventEmitter {
     super();
 
     // Create an HTTP server
-    this.server = http.createServer((req, res) => {
-      this.handleRequest(req, res);
-    });
+    this.server = http.createServer(this.handleRequest.bind(this));
 
     // Check if certificate and key options are provided for HTTPS
     if (options.cert && options.key) {
       // Create an HTTPS server with certificate and key to listen on port 443
-      this.httpsServer = https.createServer({
-        cert: fs.readFileSync(options.cert),
-        key: fs.readFileSync(options.key),
-      });
-
-      // You might want to handle HTTPS requests in a similar way as HTTP requests
-      this.httpsServer.on("request", (req, res) => {
-        this.handleRequest(req, res);
-      });
+      this.httpsServer = https.createServer(
+        {
+          cert: fs.readFileSync(options.cert),
+          key: fs.readFileSync(options.key),
+        },
+        this.handleRequest.bind(this)
+      );
       this.httpsServer.listen(443);
     }
 
