@@ -14,8 +14,9 @@ router.basePath = "/user";
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   const user = userModel.findOne({ id });
-  user.password = undefined;
+
   if (user) {
+    user.password = undefined;
     if (user.linked) {
       const link = linksModel.findOne({ user_id: user.id, linked: true });
       if (link) {

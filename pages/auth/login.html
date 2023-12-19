@@ -37,34 +37,21 @@
     border-radius: 4px;
   }
 
-  .form-container input[type="submit"] {
-    background-color: #007bff; /* Change to blue color for a button look */
-    color: white;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 16px;
-    transition: background-color 0.3s;
-    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
-  }
-
-  .form-container input[type="submit"]:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-  }
-
+  .form-container input[type="submit"],
   .form-container .register-button {
-    display: inline-block;
+    display: block; /* Make the login link a block element */
     background-color: #3498db;
     color: white;
     text-decoration: none;
-    padding: 8px 16px;
+    padding: 10px 20px;
     border-radius: 5px;
     margin-top: 10px;
     transition: background-color 0.3s;
   }
 
+  .form-container input[type="submit"]:hover,
   .form-container .register-button:hover {
-    background-color: #2980b9;
+    background-color: #0056b3; /* Darker blue on hover */
   }
 </style>
 
