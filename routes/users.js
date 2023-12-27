@@ -4,10 +4,12 @@ const userModel = require("../models/users");
 const path = require("path");
 const forumPostsModel = require("../models/forums");
 const linksModel = require("../models/links");
+
 const {
   getPlayerInfo,
   parsePlainTextResponse,
 } = require("./functions/functions");
+const { v4 } = require("uuid");
 
 router.basePath = "/user";
 

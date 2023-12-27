@@ -32,12 +32,13 @@ router.post("/create", (req, res) => {
     }
 
     const json = {
+      success: true,
       id,
       message: "Ban created successfully",
     };
     res.status(200).json(json);
   } else {
-    res.status(400).send("Missing fields");
+    res.status(400).json({ error: true, message: "Missing fields" });
   }
 });
 

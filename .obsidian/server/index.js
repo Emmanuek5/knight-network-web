@@ -4,6 +4,7 @@ const config = new Config();
 const port = config.get("port");
 let options = {};
 const cert_options = config.get("secure_certs");
+require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 
 if (cert_options.enabled) {
   options = {
