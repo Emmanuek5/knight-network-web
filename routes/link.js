@@ -44,6 +44,35 @@ router.post("/create/:uuid", (req, res) => {
   });
 });
 
+router.get("/resets/:uuid", (req, res) => {
+  const { uuid } = req.params;
+  const user = req.user;
+  if (!user) {
+    res.status(401).json({ error: true, message: "Unauthorized" });
+    return;
+  }
+  const link = passwordResetModel.findOne({
+    id: uuid,
+    completed: false,
+    user_id: req.session.user.id,
+  });
+  if (link) {
+    if (!link.created_at < Date.now() - 86400000) {
+      res.status(200).json({
+        success: true,
+        message: "Password reset link is valid",
+        token: link.token,
+      });
+      return;
+    }
+    res
+      .status(400)
+      .json({ error: true, message: "Password reset link expired" });
+    return;
+  }
+  res.status(400).json({ error: true, message: "Invalid password reset link" });
+});
+
 router.get("/password-reset/:uuid", (req, res) => {
   const { uuid } = req.params;
   const link = linksModel.findOne({ uuid, linked: true });
@@ -57,7 +86,7 @@ router.get("/password-reset/:uuid", (req, res) => {
       token: genTokem(link.user_id, process.env.PASSWORD_RESET_TOKEN_SECRET),
       created_at: Date.now(),
     });
-    const url = "https://" + req.headers.host + "/reset/mc/" + id;
+    const url = "https://" + req.headers.host + "/reset_mc/" + id;
     res.json({
       success: true,
       message: "Password reset link created",
