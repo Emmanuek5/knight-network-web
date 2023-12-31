@@ -14,6 +14,7 @@ router.post("/create/:uuid", (req, res) => {
     res.status(200).json({
       error: true,
       message: "You have already linked your account!",
+      user_id: link.user_id,
     });
     return;
   }
